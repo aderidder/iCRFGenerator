@@ -1,0 +1,8 @@
+# Ignore separate files
+*.iml
+*.log
+#exclude some directories
+/.idea
+/cache
+/target
+#other

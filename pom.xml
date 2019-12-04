@@ -1,0 +1,360 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2019 VUmc/KWF TraIT2Health-RI
+  ~
+  ~ This file is part of iCRFGenerator
+  ~
+  ~ iCRFGenerator is free software: you can redistribute it and/or modify
+  ~ it under the terms of the GNU General Public License as published by
+  ~ the Free Software Foundation, either version 3 of the License, or
+  ~ (at your option) any later version.
+  ~
+  ~ iCRFGenerator is distributed in the hope that it will be useful,
+  ~ but WITHOUT ANY WARRANTY; without even the implied warranty of
+  ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  ~ GNU General Public License for more details.
+  ~
+  ~ You should have received a copy of the GNU General Public License
+  ~ along with iCRFGenerator. If not, see <http://www.gnu.org/licenses/>
+  -->
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>iCRFGenerator</groupId>
+    <artifactId>iCRFGenerator</artifactId>
+    <version>1.0</version>
+
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>12</maven.compiler.source>
+        <maven.compiler.target>12</maven.compiler.target>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-controls</artifactId>
+            <version>12.0.1</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.controlsfx/controlsfx -->
+        <dependency>
+            <groupId>org.controlsfx</groupId>
+            <artifactId>controlsfx</artifactId>
+            <version>11.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi</artifactId>
+            <version>3.14</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>3.14</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-api -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-api</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
+        <dependency>
+            <groupId>org.apache.logging.log4j</groupId>
+            <artifactId>log4j-core</artifactId>
+            <version>2.11.0</version>
+        </dependency>
+    </dependencies>
+
+    <profiles>
+        <profile>
+            <!-- Windows Specific things -->
+            <id>platform-windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <!-- variables -->
+            <properties>
+                <fx.mods.dir>${project.build.directory}\jmods\windows</fx.mods.dir>
+                <fx.filename>javafx-jmods-12.0.1</fx.filename>
+                <fx.sourcename>javafx-12-0-1-jmods-windows</fx.sourcename>
+                <scripts.dir>${basedir}\src\main\scripts</scripts.dir>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.8</version>
+                        <executions>
+                            <execution>
+                                <!-- Download windows javafx jmods -->
+                                <id>download-files</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <!-- download file -->
+                                        <get src="https://gluonhq.com/download/${fx.sourcename}/"
+                                             dest="${project.build.directory}/${fx.filename}.zip"
+                                             verbose="false"
+                                             usetimestamp="true"/>
+                                    </target>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <!-- Extract the jmods -->
+                                <id>unpack</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <unzip dest="${fx.mods.dir}">
+                                            <fileset dir="${project.build.directory}/">
+                                                <include name="${fx.filename}.zip" />
+                                            </fileset>
+                                        </unzip>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <version>1.6.0</version>
+                        <executions>
+                            <execution>
+                                <id>Generating a Windows runtime</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>${scripts.dir}/generate_runtime.bat</executable>
+                                    <arguments>
+                                        <argument>${java.home}/bin</argument>
+                                        <argument>${fx.mods.dir}\${fx.filename}</argument>
+                                        <argument>${project.build.directory}</argument>
+                                        <argument>${scripts.dir}</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>3.1.1</version>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/assembly/zip_win.xml</descriptor>
+                            </descriptors>
+                            <outputDirectory>${project.build.directory}/final_dist</outputDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-assembly</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <!-- Mac Specific things -->
+            <id>platform-mac</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <!-- variables -->
+            <properties>
+                <fx.mods.dir>${project.build.directory}/jmods/mac</fx.mods.dir>
+                <fx.filename>javafx-jmods-12.0.1</fx.filename>
+                <fx.sourcename>javafx-12-0-1-jmods-mac</fx.sourcename>
+                <scripts.dir>${basedir}/src/main/scripts</scripts.dir>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <version>1.8</version>
+                        <executions>
+                            <execution>
+                                <!-- Download mac javafx jmods -->
+                                <id>download-files</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <!-- download file -->
+                                        <get src="https://gluonhq.com/download/${fx.sourcename}/"
+                                             dest="${project.build.directory}/${fx.filename}.zip"
+                                             verbose="false"
+                                             usetimestamp="true"/>
+                                    </target>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <!-- Extract the jmods -->
+                                <id>unpack</id>
+                                <phase>prepare-package</phase>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                                <configuration>
+                                    <target>
+                                        <unzip dest="${fx.mods.dir}">
+                                            <fileset dir="${project.build.directory}/">
+                                                <include name="${fx.filename}.zip" />
+                                            </fileset>
+                                        </unzip>
+                                    </target>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <version>1.6.0</version>
+                        <executions>
+                            <execution>
+                                <!--
+                                maybe we can remove this if we add the files to github
+                                but with the testing on mac and windows the file permissions
+                                keep getting ruined
+                                -->
+                                <id>Ensure the sh is executable</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>chmod</executable>
+                                    <arguments>
+                                        <argument>+x</argument>
+                                        <argument>${scripts.dir}/generate_runtime.sh</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <!-- calls a mac script for generating a JRE -->
+                                <id>Generating a Mac runtime</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>exec</goal>
+                                </goals>
+                                <configuration>
+                                    <executable>${scripts.dir}/generate_runtime.sh</executable>
+                                    <arguments>
+                                        <argument>${java.home}/bin</argument>
+                                        <argument>${fx.mods.dir}/${fx.filename}</argument>
+                                        <argument>${project.build.directory}</argument>
+                                        <argument>${scripts.dir}</argument>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <!-- Create a zip file for our mac distribution -->
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <version>3.1.1</version>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/assembly/zip_mac.xml</descriptor>
+                            </descriptors>
+                            <outputDirectory>${project.build.directory}/final_dist</outputDirectory>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>make-assembly</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+
+    <build>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.0</version>
+                <configuration>
+                    <release>12</release>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.1.1</version>
+                <executions>
+                    <execution>
+                        <!--
+                        Copy the dependencies to the lib directory
+                        Exclude the javafx stuff, since they're added via modules
+                        -->
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <excludeTransitive>false</excludeTransitive>
+                            <excludeArtifactIds>javafx-controls,javafx-base,javafx-controls,javafx-graphics,javafx-media,javafx-web</excludeArtifactIds>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <archive>
+                        <manifestFile>src/main/resources/META-INF/MANIFEST.MF</manifestFile>
+                    </archive>
+                    <finalName>iCRFGenerator</finalName>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

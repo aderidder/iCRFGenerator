@@ -1,0 +1,38 @@
+/* remove borders */
+.scroll-pane,
+.split-pane,
+.list-view,
+.tree-view,
+.table-view,
+.tree-table-view,
+.html-editor{
+    -fx-background-insets: 0, 0;
+}
+
+/* set button styles */
+.button {
+    -fx-text-fill: black;
+    -fx-background-color: linear-gradient(#E8E8E8, #D5D5D5);
+}
+
+.button:pressed {
+    -fx-background-color: linear-gradient(#2A5058, #61a2b1);
+}
+
+/* set hyperlink styles */
+.hyperlink {
+    -fx-font-style: italic;
+    -fx-text-fill: blue;
+    -fx-border-style: none;
+    -fx-underline: false;
+    -fx-border-color: transparent;
+    -fx-padding: 4 0 4 0;
+}
+
+.hyperlink:hover {
+    -fx-underline: true;
+}
+
+.tree-cell:search-match {
+    -fx-background: yellow ;
+}

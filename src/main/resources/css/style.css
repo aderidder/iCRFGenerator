@@ -1,0 +1,69 @@
+.label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: black;
+    -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.5) , 0,0,0,1 );
+}
+#title {
+    -fx-font-size: 32px;
+    -fx-font-family: "Arial Black";
+    -fx-fill: black;
+    -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.5) , 0,0,0,1 );
+}
+
+#title2 {
+    -fx-font-size: 20px;
+    -fx-font-family: "Arial Black";
+    -fx-fill: black;
+    -fx-effect: dropshadow( gaussian , rgba(255,255,255,0.5) , 0,0,0,1 );
+}
+
+.button {
+    -fx-text-fill: white;
+    -fx-font-family: "Arial Narrow";
+    -fx-font-weight: bold;
+    -fx-background-color: linear-gradient(#61a2b1, #2A5058);
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+}
+
+.button:pressed {
+    -fx-background-color: linear-gradient(#2A5058, #61a2b1);
+}
+
+.fillBackground{
+    -fx-background-color: #689BCE;
+}
+
+.fillBackgroundWhite{
+    -fx-background-color: white;
+}
+
+#topPane .choice-box .label {
+    -fx-font-size: 11;
+}
+
+.text-area {
+    -fx-background-color: #336699;
+    -fx-font-family: "Arial";
+    -fx-text-fill: black;
+    -fx-font-size: 12;
+    -fx-padding: 4;
+
+}
+
+.hyperlink {
+    -fx-font-style: italic;
+    -fx-text-fill: blue;
+    -fx-effect: dropshadow( three-pass-box , rgba(0,0,0,0.6) , 5, 0.0 , 0 , 1 );
+    -fx-border-style: none;
+    -fx-underline: false;
+}
+
+.hyperlink:hover {
+    -fx-underline: true;
+}
+
+.dialog-pane  {
+        -fx-border-color: black;
+        -fx-border-width: 4;
+}
