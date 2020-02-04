@@ -6,7 +6,7 @@ Semantic interoperability of clinical data requires the use of a common vocabula
 
 By using the definitions from such codebooks, a user ensures interoperability with all datasets using these definitions, thus increasing the FAIRness of the data. 
 
-To learn more about the iCRF Generator, find the publication here: <URL>. If you use the iCRF Generator for your project, please cite the paper. 
+***Learn more about the iCRF Generator in the [publication](https://f1000research.com/articles/9-81/v1). If you use the iCRF Generator for your project, please cite the paper!*** 
 
 ## Supported EDCs
 Currently the program can create a core file for:
