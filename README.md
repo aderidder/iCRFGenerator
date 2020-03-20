@@ -61,6 +61,9 @@ I created a profile for both Mac and Windows. So basically, if you're on one of 
 
 TODO: find out whether it is possible to change this, especially the JavaFX bit.
 
+## Roadmap
+Find our plans for future improvements [here](docs/roadmap.md)! 
+
 ## About
 Generate CRF was designed and created by **Sander de Ridder** (VUmc 2019) and Jeroen Beliën (VUmc).\
 Testers & Consultants: 
