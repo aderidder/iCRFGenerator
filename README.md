@@ -6,7 +6,7 @@ Semantic interoperability of clinical data requires the use of a common vocabula
 
 By using the definitions from such codebooks, a user ensures interoperability with all datasets using these definitions, thus increasing the FAIRness of the data. 
 
-***Learn more about the iCRF Generator in the [publication](https://f1000research.com/articles/9-81/v1). If you use the iCRF Generator for your project, please cite the paper!*** 
+***Learn more about the iCRF Generator in the [publication](https://f1000research.com/articles/9-81). If you use the iCRF Generator for your project, please cite the paper!*** 
 
 ## Supported EDCs
 Currently the program can create a core file for:
@@ -45,6 +45,8 @@ Unpack the file and double-click the runme.command file. If it doesn't run, your
 * Paste the following command and press enter:  
   `java-runtime/bin/java --add-opens javafx.graphics/javafx.scene=ALL-UNNAMED -cp GenerateCRF.jar:./lib/* generatecrf.GenerateCRF`
 
+NOTE: The software was tested on Mac OS El Capitan. With Mac OS Catalina Apple has made some security changes. This effect is that, unfortunately, the out of the box solution presented above does not work anymore. We are looking into this.
+
 ## Some limitations
 * The iCRF Generator aims at generating items, so additional details (such as sections, repeating groups, etc) will have to be added manually.
 * The iCRF Generator currently allows access to six codebooks. We may add support for more codebooks in the future. If you have a great codebook available, which is unique and not overlapping too much with existing codebooks, feel free to contact us and we'll see whether it can be added.
@@ -65,15 +67,15 @@ TODO: find out whether it is possible to change this, especially the JavaFX bit.
 Find our plans for future improvements [here](docs/roadmap.md)! 
 
 ## About
-Generate CRF was designed and created by **Sander de Ridder** (VUmc 2019) and Jeroen Beliën (VUmc).\
+The iCRF Generator was designed and created by **Sander de Ridder** (VUmc 2019) and Jeroen Beliën (VUmc).\
 Testers & Consultants: 
 * Gerben Rienk Visser (Trial Data Solutions)
 * REDCap testing - Wessel Sloof (UMCG)
 This project was sponsored by KWF project TraIT2Health-RI (WP: Registry-in-a-Box)
 ---
-GenerateCRF is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+iCRFGenerator is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
-GenerateCRF is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+iCRFGenerator is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 
 ---
 

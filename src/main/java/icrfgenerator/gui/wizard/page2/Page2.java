@@ -93,7 +93,7 @@ public class Page2 extends WizardPane {
 
         GridPane gridPane = createVersionLanguagesGridPane(codebook);
         gridPane.setPrefWidth(580);
-        tab.setContent(gridPane);
+        tab.setContent(new ScrollPane(gridPane));
         return tab;
     }
 
@@ -140,8 +140,8 @@ public class Page2 extends WizardPane {
             // by selecting the tab
             newTabPane.getSelectionModel().select(tab);
         }
-        // add the tab pane to a scroll pane and set the content
-        this.setContent(new ScrollPane(newTabPane));
+        // set the content
+        this.setContent(newTabPane);
 
         // select the first tab
         newTabPane.getSelectionModel().selectFirst();
