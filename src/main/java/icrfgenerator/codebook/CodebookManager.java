@@ -84,6 +84,10 @@ public class CodebookManager {
         return codebookItemsMap.get(key).getCodebookItem(itemId).getValueForCode(code);
     }
 
+    public String getCodesystemForCode(String key, String itemId, String code){
+        return codebookItemsMap.get(key).getCodebookItem(itemId).getCodesystemForCode(code);
+    }
+
     /**
      * Loads codebooks into memory.
      * For each codebook + datasetId + language that the user has selected, checks whether

@@ -19,6 +19,7 @@
 
 package icrfgenerator.edc.edc.edcrunsettings.redcap;
 
+import icrfgenerator.edc.edc.EDC;
 import icrfgenerator.edc.edc.REDCapEDC;
 import icrfgenerator.settings.runsettings.RunSettings;
 
@@ -26,8 +27,8 @@ import icrfgenerator.settings.runsettings.RunSettings;
  * REDCap specific runsettings
  */
 public class REDCapRunSettings extends RunSettings {
-    public REDCapRunSettings(){
-        super(new REDCapEDC());
+    public REDCapRunSettings(EDC edc){
+        super(edc);
     }
 
     /**

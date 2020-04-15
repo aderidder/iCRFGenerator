@@ -27,7 +27,7 @@ import java.util.*;
 public class GlobalSettings {
     public static String server = "http://decor.nictiz.nl/services/";
 
-    private static List<String> edcList = Arrays.asList("Castor", "REDCap", "OpenClinica 3");
+    private static List<String> edcList = Arrays.asList("REDCap", "OpenClinica 3", "Castor - Step", "Castor - Report", "Castor - Survey");
     private static List<String> uiLanguages = Arrays.asList("en", "nl");
 
     // timeout settings; 5000 is 5 seconds.

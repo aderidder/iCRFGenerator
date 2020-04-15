@@ -19,6 +19,7 @@
 
 package icrfgenerator.edc.edc.edcrunsettings.openclinica3;
 
+import icrfgenerator.edc.edc.EDC;
 import icrfgenerator.edc.edc.OpenClinica3EDC;
 import icrfgenerator.settings.runsettings.RunSettings;
 
@@ -26,8 +27,8 @@ import icrfgenerator.settings.runsettings.RunSettings;
  * OpenClinica 3 specific item details
  */
 public class OpenClinica3RunSettings extends RunSettings {
-    public OpenClinica3RunSettings(){
-        super(new OpenClinica3EDC());
+    public OpenClinica3RunSettings(EDC edc){
+        super(edc);
     }
 
     /**

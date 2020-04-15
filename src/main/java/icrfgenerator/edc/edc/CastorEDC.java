@@ -36,21 +36,42 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static icrfgenerator.edc.edc.CastorEDC.generateUUID;
+import static icrfgenerator.edc.edc.CastorEDC.*;
 
 /**
  * Castor EDC
  * Some useful information about export and importing of Castor forms can be found here:
  * https://helpdesk.castoredc.com/article/170-export-and-import-the-form-structure
  */
-public class CastorEDC extends EDCDefault {
+abstract public class CastorEDC extends EDCDefault {
+    /**
+     * generates an UUID as used by Castor
+     *
+     * @return a new random UUID
+     */
+    static String generateUUID() {
+        return UUID.randomUUID().toString().toUpperCase();
+    }
+
+    private static Map<String, Integer> codesystemMap = new HashMap<>();
+    private static int codesystemCounter=1;
+
+    static void addCodesystem(String codesystem){
+        if(!codesystemMap.containsKey(codesystem)){
+            codesystemMap.put(codesystem, codesystemCounter++);
+        }
+    }
+    static String getCodesystemNumber(String codesystem){
+        return String.valueOf(codesystemMap.get(codesystem));
+    }
+
     private int fieldNumber = 1;
     private String dateCreated;
     private static final String updatedBy = "F578677A-5CA4-9222-1C4D-C295CF4C4135"; // My id in Castor
 
     private StringBuilder fullXML;
 
-    public CastorEDC() {
+    protected CastorEDC() {
         super("Castor");
     }
 
@@ -88,6 +109,9 @@ public class CastorEDC extends EDCDefault {
     @Override
     public void generateCRF() {
         setDateCreated();
+        codesystemMap.clear();
+        codesystemCounter=1;
+        fieldNumber = 1;
 
         // create a couple of string buffers
         StringBuilder fieldsBuilder = new StringBuilder();
@@ -131,6 +155,7 @@ public class CastorEDC extends EDCDefault {
         }
     }
 
+
     /**
      * Store date + time
      */
@@ -150,6 +175,11 @@ public class CastorEDC extends EDCDefault {
     private void buildXML(StringBuilder fieldsBuilder, StringBuilder optionListsBuilder, String stepId) {
         fullXML = new StringBuilder();
         String phaseId = generateUUID();
+        // Not a clue why, but version has to be 3 for reports, whereas 1 is accepted for both the normal
+        // crf and the survey. However, as every form from castor forms has version 3, we'll set it to
+        // 3 to be on the safe side...
+        int version = 3;
+
 
         fullXML.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>").
                 append("<xml>").
@@ -157,26 +187,33 @@ public class CastorEDC extends EDCDefault {
                 append("<optionLists>");
         fullXML.append(optionListsBuilder.toString());
         fullXML.append("</optionLists>").
-                append("<version>1</version>").
+                append("<version>").append(version).append("</version>").
                 append("<metadata>1</metadata>").
                 append("<date_created>").append(dateCreated).append("</date_created>").
-                append("<created_by>The Registry in a Box CRF Generator</created_by>").
-                append("<lookupTable/>").
-                append("<study name=\"Study\" guid=\"study\">").
-                append("<phases>").
-                append("<ph_" + phaseId + " name=\"GeneratedPhase\" guid=\"" + phaseId + "\" duration=\"0\" order=\"1\" rejected=\"0\" stepCount=\"1\">").
-                append("<steps>").
-                append("<st_" + stepId + " step_id=\"" + stepId + "\" study_phase_id=\"" + phaseId + "\" step_number=\"1\" step_name=\"GeneratedStep\" step_desc=\"GeneratedStep\" step_status=\"active\" name=\"GeneratedStep\" guid=\"" + stepId + "\" rejected=\"0\">").
-                append("<fields>");
+                append("<created_by>The Registry in a Box iCRF Generator</created_by>").
+                append("<lookupTable/>");
+        buildXMLForFormPart1(fullXML, stepId, phaseId);
+        fullXML.append("<fields>");
         fullXML.append(fieldsBuilder.toString());
-        fullXML.append("</fields>").
-                append("</st_").append(stepId).append(">").
-                append("</steps>").
-                append("</ph_").append(phaseId).append(">").
-                append("</phases>").
-                append("</study>").
-                append("<export_type>step</export_type>").
-                append("</xml>");
+        fullXML.append("</fields>");
+        buildXMLForFormPart2(fullXML, stepId, phaseId);
+        if(codesystemMap.size()>0) fullXML.append(getMetadataTypes());
+        fullXML.append("</xml>");
+    }
+
+    private String getMetadataTypes(){
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("<metadataTypes>");
+        for (Map.Entry<String, Integer> entry : codesystemMap.entrySet()) {
+            stringBuilder.
+                    append("<mt_"+entry.getValue()+">").
+                    append("<type_id>").append(entry.getValue()).append("</type_id>").
+                    append("<name>").append(entry.getKey()).append("</name>").
+                    append("<description>").append(entry.getKey()).append("</description>").
+                    append("</mt_"+entry.getValue()+">");
+        }
+        stringBuilder.append("</metadataTypes>");
+        return stringBuilder.toString();
     }
 
     /**
@@ -189,21 +226,23 @@ public class CastorEDC extends EDCDefault {
      * @param stepId             id of the step
      */
     private void createTerminologyItem(StringBuilder fieldsBuilder, StringBuilder optionListsBuilder, String key, String itemId, String stepId) {
+        String fieldId = generateUUID();
+
         // create an options group for castor
-        CastorOptionsGroup castorOptionsGroup = new CastorOptionsGroup(key, itemId);
+        CastorOptionsHelper castorOptionsHelper = new CastorOptionsHelper(key, itemId, fieldId);
         // get the codes for the item
         List<String> selectedCodes = RunSettings.getInstance().getSelectedItemSelectedTerminologyCodes(key, itemId);
         // add each code as an option tot the options group
         for (String code : selectedCodes) {
-            castorOptionsGroup.addOption(code);
+            castorOptionsHelper.addOption(code);
         }
 
         // get a string representation of the options group and add it to the optionList buffer, which we need later on when
         // we generate the XML
-        optionListsBuilder.append(castorOptionsGroup.getOptionGroupString());
+        optionListsBuilder.append(castorOptionsHelper.getOptionGroupString());
 
         // add a field definition
-        addFieldXML(fieldsBuilder, key, itemId, stepId, castorOptionsGroup.getOptionGroupFieldString(), castorOptionsGroup.getOptionGroupId());
+        addFieldXML(fieldsBuilder, key, itemId, stepId, fieldId, castorOptionsHelper.getOptionGroupFieldString(), castorOptionsHelper.getOptionGroupMetadataString(), castorOptionsHelper.getOptionGroupId());
 
     }
 
@@ -216,8 +255,9 @@ public class CastorEDC extends EDCDefault {
      * @param stepId        id of the step
      */
     private void createNonTerminologyItem(StringBuilder fieldsBuilder, String key, String itemId, String stepId) {
+        String fieldId = generateUUID();
         // add a field definition
-        addFieldXML(fieldsBuilder, key, itemId, stepId, "", "");
+        addFieldXML(fieldsBuilder, key, itemId, stepId, fieldId, "", "", "");
     }
 
     /**
@@ -230,14 +270,13 @@ public class CastorEDC extends EDCDefault {
      * @param optionGroupString string for the options group as it should appear in the Field part
      * @param optionGroupId     id of the options group
      */
-    private void addFieldXML(StringBuilder fieldsBuilder, String key, String itemId, String stepId, String optionGroupString, String optionGroupId) {
+    private void addFieldXML(StringBuilder fieldsBuilder, String key, String itemId, String stepId, String fieldId, String optionGroupString, String metadataString, String optionGroupId) {
         // since we need all the details, grab the CastorRunSettings
         CastorRunSettings runSettings = (CastorRunSettings) RunSettings.getInstance();
         CodebookManager codebookManager = CodebookManager.getInstance();
         CodebookItem codebookItem = codebookManager.getCodebookItem(key, itemId);
 
         // retrieve / generate field details for Castor
-        String fieldId = generateUUID();
         String fieldType = runSettings.getSelectedItemFieldType(key, itemId);
         String fieldDescription = CastorDefinition.getFieldTypeDescription(fieldType);
         String fieldLabel = codebookItem.getItemName();
@@ -282,9 +321,12 @@ public class CastorEDC extends EDCDefault {
                 append("<field_image></field_image>").
                 append("<field_slider_step></field_slider_step>").
                 append("<exclude_on_data_export>0</exclude_on_data_export>").
-                append("<field_hidden>0</field_hidden>").
-                append("<encryption_enabled>false</encryption_enabled>").
-                append("<report_id></report_id>").
+                append("<field_hidden>0</field_hidden>");
+//                append("<encryption_enabled>false</encryption_enabled>");
+
+                buildXMLForFormPart3(fieldsBuilder, fieldLabel);
+
+                fieldsBuilder.append("<report_id></report_id>").
                 append("<additional_config></additional_config>").
                 append("<option_group>").
                 append(optionGroupString).
@@ -292,27 +334,52 @@ public class CastorEDC extends EDCDefault {
                 append("<dependencyChilds/>").
                 append("<dependencyParents/>").
                 append("<validation/>").
-                append("<field_label_parsed>").append(fieldLabel).append("</field_label_parsed>").
+//                append("<field_label_parsed>").append(fieldLabel).append("</field_label_parsed>").
+//                append(metadataString).
+        append(addFieldMetaData(codebookItem, metadataString, fieldId)).
                 append("</fi_").append(fieldId).append(">");
     }
 
-    /**
-     * generates an UUID as used by Castor
-     *
-     * @return a new random UUID
-     */
-    static String generateUUID() {
-        return UUID.randomUUID().toString().toUpperCase();
+    private String addFieldMetaData(CodebookItem codebookItem, String optionsMetadataString, String fieldId){
+        String codeSystem = codebookItem.getCodeSystem();
+        String metadata="";
+
+        if(codeSystem.equalsIgnoreCase("") && optionsMetadataString.equalsIgnoreCase("")){
+            return "";
+        }
+        else if(!codeSystem.equalsIgnoreCase("")) {
+            String itemCode = codebookItem.getCode();
+            addCodesystem(codeSystem);
+            String metadataId = generateUUID();
+            metadata = "<m_" + metadataId + ">" +
+                    "<metadata_id>" + metadataId + "</metadata_id>" +
+                    "<metadata_parent_id></metadata_parent_id>" +
+                    "<element_id>" + fieldId + "</element_id>" +
+                    "<element_type>1</element_type>" +
+                    "<metadata_type>" + StringUtils.prepareValueForXML(getCodesystemNumber(codeSystem)) + "</metadata_type>" +
+                    "<metadata_description>" + StringUtils.prepareValueForXML(codebookItem.getItemName()) + "</metadata_description>" +
+                    "<metadata_value>" + itemCode + "</metadata_value>" +
+                    "</m_" + metadataId + ">";
+        }
+
+        return "<metadata>"+optionsMetadataString+metadata+"</metadata>";
+
     }
+
+    protected abstract void buildXMLForFormPart1(StringBuilder stringBuilder, String stepId, String phaseId);
+    protected abstract void buildXMLForFormPart2(StringBuilder stringBuilder, String stepId, String phaseId);
+    protected abstract void buildXMLForFormPart3(StringBuilder stringBuilder, String fieldLabel);
+
 }
 
 /**
  * Castor options group
  */
-class CastorOptionsGroup {
+class CastorOptionsHelper {
     private String key;
     private String itemId;
     private String optionGroupId;
+    private String fieldId;
     private List<Option> options = new ArrayList<>();
 
     /**
@@ -320,8 +387,9 @@ class CastorOptionsGroup {
      * @param key codebook + datasetid + language
      * @param itemId id of the item
      */
-    CastorOptionsGroup(String key, String itemId) {
+    CastorOptionsHelper(String key, String itemId, String fieldId) {
         this.optionGroupId = generateUUID();
+        this.fieldId = fieldId;
         this.key = key;
         this.itemId = itemId;
     }
@@ -379,6 +447,19 @@ class CastorOptionsGroup {
         return stringBuilder.toString();
     }
 
+    String getOptionGroupMetadataString(){
+        StringBuilder stringBuilder = new StringBuilder();
+
+//        stringBuilder.append("<metadata>");
+        // add each option
+        for(Option option:options){
+            stringBuilder.append(option.getOptionMetadataString(fieldId));
+        }
+//        stringBuilder.append("</metadata>");
+
+        return stringBuilder.toString();
+    }
+
     /**
      * returns the name with " Options" as suffix, which is used as the name of a group
      * @return the name for the options group
@@ -403,6 +484,8 @@ class CastorOptionsGroup {
      * a single option
      */
     class Option{
+        String value;
+        String codesystem;
         String code;
         String optionId;
         int order;
@@ -415,7 +498,10 @@ class CastorOptionsGroup {
         Option(String code, int order){
             this.code = code;
             this.order = order;
+            this.value = CodebookManager.getInstance().getValueForCode(key, itemId, code);
+            this.codesystem = CodebookManager.getInstance().getCodesystemForCode(key, itemId, code);
             optionId = generateUUID();
+            addCodesystem(codesystem);
         }
 
         /**
@@ -435,9 +521,24 @@ class CastorOptionsGroup {
         String getOptionFieldString(){
             return  "<option_id>"+optionId+"</option_id>" +
                     "<option_group_id>"+optionGroupId+"</option_group_id>" +
-                    "<option_name>"+StringUtils.prepareValueForXML(CodebookManager.getInstance().getValueForCode(key, itemId, code))+"</option_name>" +
-                    "<option_value>"+code+"</option_value>" +
+                    "<option_name>"+StringUtils.prepareValueForXML(value)+"</option_name>" +
+//                    "<option_value>"+code+"</option_value>" +
+                    "<option_value>"+StringUtils.prepareValueForXML(value)+"</option_value>" +
                     "<option_group_order>"+order+"</option_group_order>";
+        }
+
+        String getOptionMetadataString(String fieldId){
+            String metadataId = generateUUID();
+            return "<m_"+metadataId+">" +
+                   "<metadata_id>"+metadataId+"</metadata_id>" +
+                   "<metadata_parent_id></metadata_parent_id>" +
+                   "<element_id>"+fieldId+"</element_id>" +
+                   "<element_type>1</element_type>" +
+                   "<metadata_type>"+StringUtils.prepareValueForXML(getCodesystemNumber(codesystem))+"</metadata_type>" +
+                   "<metadata_description>"+StringUtils.prepareValueForXML(value)+"</metadata_description>" +
+                   "<metadata_value>"+code+"</metadata_value>" +
+                   "</m_"+metadataId+">";
+
         }
     }
 }

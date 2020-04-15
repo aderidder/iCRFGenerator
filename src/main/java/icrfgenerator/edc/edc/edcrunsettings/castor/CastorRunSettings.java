@@ -20,15 +20,19 @@
 package icrfgenerator.edc.edc.edcrunsettings.castor;
 
 import icrfgenerator.edc.edc.CastorEDC;
+import icrfgenerator.edc.edc.EDC;
 import icrfgenerator.settings.runsettings.RunSettings;
 
 /**
  * Castor specific runsettings
  */
 public class CastorRunSettings extends RunSettings {
-    public CastorRunSettings(){
-        super(new CastorEDC());
+    public CastorRunSettings(EDC edc){
+        super(edc);
     }
+//    public CastorRunSettings(String type){
+//        super(new CastorEDC(type));
+//    }
 
     /**
      * add an EDC specific container to store items for this EDC

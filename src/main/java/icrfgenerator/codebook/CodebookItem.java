@@ -103,6 +103,10 @@ public class CodebookItem {
         return codelistItemList.stream().filter(t->t.code.equalsIgnoreCase(code)).findFirst().get().textvalue;
     }
 
+    String getCodesystemForCode(String code){
+        return codelistItemList.stream().filter(t->t.code.equalsIgnoreCase(code)).findFirst().get().codeSystem;
+    }
+
     /**
      * get the item's id
      * @return the item's id
@@ -192,7 +196,7 @@ public class CodebookItem {
     void resolveToGenerateCodeListItems(){
         if(toGenerateCodeListItemList.size()>0) {
             for (int i = 0; i < toGenerateCodeListItemList.size(); i++) {
-                codelistItemList.add(new CodelistItem("Code_" + (i+1), toGenerateCodeListItemList.get(i), "<generated code>"));
+                codelistItemList.add(new CodelistItem("Code_" + (i+1), toGenerateCodeListItemList.get(i), "Generated"));
             }
             codeDataType = "string";
         }

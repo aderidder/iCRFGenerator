@@ -32,8 +32,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 import static icrfgenerator.utils.XMLUtils.*;
@@ -142,7 +141,7 @@ class Codebook {
             DocumentBuilder db = dbf.newDocumentBuilder();
             Document dom = db.parse(file);
 
-            //get the root element
+        // get the root element
             return dom.getDocumentElement();
         } catch (Exception e){
             e.printStackTrace();

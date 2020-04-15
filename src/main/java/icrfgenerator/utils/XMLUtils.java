@@ -78,6 +78,15 @@ public class XMLUtils {
         fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
     }
 
+    /**
+     * cleans a string
+     * currently: replacing the "&#160" that sometimes appears in the ART-DECOR XML, e.g. identifierName="SNOMED&#160;CT"
+     * @param value string
+     * @return cleaned string
+     */
+    private static String cleanString(String value){
+        return value.replaceAll("\\u00A0", " ");
+    }
 
     /**
      * returns the value of an xml attribute
@@ -86,7 +95,7 @@ public class XMLUtils {
      * @return the value of an xml attribute or empty string if the attribute does not exist;
      */
     public static String getAttributeValue(Element element, String attributeName){
-        return element.getAttribute(attributeName);
+        return cleanString(element.getAttribute(attributeName));
     }
 
     /**
@@ -96,7 +105,8 @@ public class XMLUtils {
      * @return true/false
      */
     public static boolean hasValidStatusCode(Element element){
-        String statusCode = element.getAttribute("statusCode");
+//        String statusCode = element.getAttribute("statusCode");
+        String statusCode = getAttributeValue(element, "statusCode");
         return statusCode.equalsIgnoreCase("draft") || statusCode.equalsIgnoreCase("final");
     }
 
