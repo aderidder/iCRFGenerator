@@ -25,20 +25,22 @@
 
     <groupId>iCRFGenerator</groupId>
     <artifactId>iCRFGenerator</artifactId>
-    <version>1.0</version>
+    <version>1.1</version>
 
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>12</maven.compiler.source>
         <maven.compiler.target>12</maven.compiler.target>
+        <javafx.version>14</javafx.version>
     </properties>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.openjfx/javafx-controls -->
         <dependency>
             <groupId>org.openjfx</groupId>
             <artifactId>javafx-controls</artifactId>
-            <version>12.0.1</version>
+            <version>${javafx.version}</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.controlsfx/controlsfx -->
         <dependency>
@@ -82,8 +84,7 @@
             <!-- variables -->
             <properties>
                 <fx.mods.dir>${project.build.directory}\jmods\windows</fx.mods.dir>
-                <fx.filename>javafx-jmods-12.0.1</fx.filename>
-                <fx.sourcename>javafx-12-0-1-jmods-windows</fx.sourcename>
+                <fx.sourcename>javafx-${javafx.version}-jmods-windows</fx.sourcename>
                 <scripts.dir>${basedir}\src\main\scripts</scripts.dir>
             </properties>
             <build>
@@ -104,7 +105,7 @@
                                     <target>
                                         <!-- download file -->
                                         <get src="https://gluonhq.com/download/${fx.sourcename}/"
-                                             dest="${project.build.directory}/${fx.filename}.zip"
+                                             dest="${project.build.directory}/${fx.sourcename}.zip"
                                              verbose="false"
                                              usetimestamp="true"/>
                                     </target>
@@ -119,10 +120,11 @@
                                 </goals>
                                 <configuration>
                                     <target>
-                                        <unzip dest="${fx.mods.dir}">
-                                            <fileset dir="${project.build.directory}/">
-                                                <include name="${fx.filename}.zip" />
-                                            </fileset>
+                                        <unzip src="target/${fx.sourcename}.zip" dest="${fx.mods.dir}">
+                                            <patternset>
+                                                <include name="**/*.jmod"/>
+                                            </patternset>
+                                            <mapper type="flatten"/>
                                         </unzip>
                                     </target>
                                 </configuration>
@@ -144,7 +146,7 @@
                                     <executable>${scripts.dir}/generate_runtime.bat</executable>
                                     <arguments>
                                         <argument>${java.home}/bin</argument>
-                                        <argument>${fx.mods.dir}\${fx.filename}</argument>
+                                        <argument>${fx.mods.dir}</argument>
                                         <argument>${project.build.directory}</argument>
                                         <argument>${scripts.dir}</argument>
                                     </arguments>
@@ -186,8 +188,7 @@
             <!-- variables -->
             <properties>
                 <fx.mods.dir>${project.build.directory}/jmods/mac</fx.mods.dir>
-                <fx.filename>javafx-jmods-12.0.1</fx.filename>
-                <fx.sourcename>javafx-12-0-1-jmods-mac</fx.sourcename>
+                <fx.sourcename>javafx-${javafx.version}-jmods-mac</fx.sourcename>
                 <scripts.dir>${basedir}/src/main/scripts</scripts.dir>
             </properties>
             <build>
@@ -208,7 +209,7 @@
                                     <target>
                                         <!-- download file -->
                                         <get src="https://gluonhq.com/download/${fx.sourcename}/"
-                                             dest="${project.build.directory}/${fx.filename}.zip"
+                                             dest="${project.build.directory}/${fx.sourcename}.zip"
                                              verbose="false"
                                              usetimestamp="true"/>
                                     </target>
@@ -223,10 +224,11 @@
                                 </goals>
                                 <configuration>
                                     <target>
-                                        <unzip dest="${fx.mods.dir}">
-                                            <fileset dir="${project.build.directory}/">
-                                                <include name="${fx.filename}.zip" />
-                                            </fileset>
+                                        <unzip src="target/${fx.sourcename}.zip" dest="${fx.mods.dir}">
+                                            <patternset>
+                                                <include name="**/*.jmod"/>
+                                            </patternset>
+                                            <mapper type="flatten"/>
                                         </unzip>
                                     </target>
                                 </configuration>
@@ -268,7 +270,7 @@
                                     <executable>${scripts.dir}/generate_runtime.sh</executable>
                                     <arguments>
                                         <argument>${java.home}/bin</argument>
-                                        <argument>${fx.mods.dir}/${fx.filename}</argument>
+                                        <argument>${fx.mods.dir}</argument>
                                         <argument>${project.build.directory}</argument>
                                         <argument>${scripts.dir}</argument>
                                     </arguments>
