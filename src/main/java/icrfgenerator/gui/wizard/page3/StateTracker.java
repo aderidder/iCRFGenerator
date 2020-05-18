@@ -17,9 +17,10 @@
  * along with iCRFGenerator. If not, see <http://www.gnu.org/licenses/>
  */
 
-package icrfgenerator.edc.edc.edcspecificpane;
+package icrfgenerator.gui.wizard.page3;
 
 import icrfgenerator.codebook.CodebookItem;
+import icrfgenerator.edc.edc.edcspecificpane.EDCSpecificPane;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,7 +40,7 @@ import org.apache.logging.log4j.Logger;
  *
  * In the case of numbers 5. and 6. the tree fires both a (de)select and a highlight event.
  */
-public class StateTracker {
+class StateTracker {
 
     private static final Logger logger = LogManager.getLogger(StateTracker.class.getName());
 
@@ -65,7 +66,7 @@ public class StateTracker {
      * @param codebookItem     the item that is highlighted
      * @param edcSpecificPane the right-side pane on which the action should take place
      */
-    public void highlightNonLeafNode(CodebookItem codebookItem, EDCSpecificPane edcSpecificPane){
+    void highlightNonLeafNode(CodebookItem codebookItem, EDCSpecificPane edcSpecificPane){
         stateCodebookItem = codebookItem;
         edcSpecificPane.setInfoPane();
     }
@@ -77,7 +78,7 @@ public class StateTracker {
      * @param edcSpecificPane the right-side pane on which the action should take place
      * @param isSelected       indicator whether the item's checkbox is selected or not
      */
-    public void highlightAction(CodebookItem codebookItem, String key, EDCSpecificPane edcSpecificPane, boolean isSelected){
+    void highlightAction(CodebookItem codebookItem, String key, EDCSpecificPane edcSpecificPane, boolean isSelected){
         highlightAction = HighlightAction.HIGHLIGHTING;
 
         // if there is a select action, the user (de)selected an item in a not-yet highlighted row (5. or 6.)
@@ -105,7 +106,7 @@ public class StateTracker {
      * @param key              codebook + datasetId + language
      * @param edcSpecificPane the right-side pane on which the action should take place
      */
-    public void selectAction(CodebookItem codebookItem, String key, EDCSpecificPane edcSpecificPane){
+    void selectAction(CodebookItem codebookItem, String key, EDCSpecificPane edcSpecificPane){
         selectAction = SelectAction.SELECTING;
 
         // if the item did not change, it's already highlighted.
@@ -127,7 +128,7 @@ public class StateTracker {
      * @param key              codebook + datasetId + language
      * @param edcSpecificPane the right-side pane on which the action should take place
      */
-    public void deSelectAction(CodebookItem codebookItem, String key, EDCSpecificPane edcSpecificPane){
+    void deSelectAction(CodebookItem codebookItem, String key, EDCSpecificPane edcSpecificPane){
         selectAction = SelectAction.DESELECTING;
 
         // if the item did not change, it's already highlighted.
@@ -192,6 +193,14 @@ public class StateTracker {
         // reset
         highlightAction = HighlightAction.NOACTION;
         selectAction = SelectAction.NOACTION;
+    }
+
+    /**
+     * returns the current state's codebookItem.
+     * @return the current state's codebookItem
+     */
+    CodebookItem getStateCodebookItem(){
+        return stateCodebookItem;
     }
 
     /**

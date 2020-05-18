@@ -27,6 +27,8 @@ import icrfgenerator.utils.GUIUtils;
 import icrfgenerator.utils.GeneralUtils;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
 import javafx.scene.control.*;
 import org.controlsfx.dialog.Wizard;
@@ -86,6 +88,13 @@ public class Page3 extends WizardPane {
         // retrieve the tab pane that is stored within (which contains / will contain tabs for each selected language)
         TabPane newCodebookVersionTabPane = (TabPane) newCodebookVersionTab.getContent();
 
+        newCodebookVersionTabPane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
+            @Override
+            public void changed(ObservableValue<? extends Tab> observableValue, Tab oldTab, Tab newTab) {
+                ((LanguageTab)newTab).updatePropertiesDialogWindow();
+            }
+        });
+
         // fetch the selected languages
         List<String> languages = runSettings.getSelectedLanguages(codebook, datasetId);
         for(String language:languages){
@@ -115,9 +124,18 @@ public class Page3 extends WizardPane {
         tab.setId(key);
         tab.setClosable(false);
         tab.setContent(new TabPane());
+//        tab.setOnSelectionChanged(e->updatePropertiesDialogWindow(tab));
         return tab;
     }
-
+//
+//    private void updatePropertiesDialogWindow(Tab tab){
+//        if (tab.isSelected()) {
+//            List<Tab> tabs = ((TabPane)tab.getContent()).getTabs();
+//            for(Tab subTab:tabs) {
+//                ((LanguageTab)subTab).updatePropertiesDialogWindow();
+//            }
+//        }
+//    }
 
     /**
      * starts codebook loading in the background to prevent an unresponsive UI
@@ -164,6 +182,14 @@ public class Page3 extends WizardPane {
         this.setContent(newTabPane);
         selectFirstTab(newTabPane);
 
+        newTabPane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
+            @Override
+            public void changed(ObservableValue<? extends Tab> observableValue, Tab oldTab, Tab newTab) {
+                TabPane tabPane = (TabPane)newTab.getContent();
+                ((LanguageTab)tabPane.getSelectionModel().getSelectedItem()).updatePropertiesDialogWindow();
+            }
+        });
+
         showButtons();
         this.setHeaderText(I18N.getLanguageText("page3Title")+" "+runSettings.getEDC().getEDCName()+" CRF...");
         checkMayProceed();
@@ -173,7 +199,7 @@ public class Page3 extends WizardPane {
      * if we select e.g. the second language tab, navigate to the summary and then
      * navigate back, the item selection right side will have visual issues
      * so we basically reselect the first tab and first language tab
-     * @param newTabPane
+     * @param newTabPane tab pane
      */
     private void selectFirstTab(TabPane newTabPane){
         newTabPane.getSelectionModel().selectLast();
@@ -236,6 +262,7 @@ public class Page3 extends WizardPane {
     @Override
     public void onExitingPage(Wizard wizard) {
 //        runSettings.printSelectedItems();
+        PropertiesDialog.hideWindow();
     }
 
 }

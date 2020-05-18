@@ -20,6 +20,7 @@
 package icrfgenerator.codebook;
 
 import icrfgenerator.settings.GlobalSettings;
+import icrfgenerator.utils.XMLUtils;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -320,7 +321,7 @@ class Codebook {
         String id = getUniqueId(getAttributeValue(conceptElement, "id"));
         String name = getElementValue(conceptElement, "name")+" - Infinite";
         String description = getElementValue(conceptElement, "desc")+ " - Infinite";
-        return new CodebookItem(id, name, description, "string", "item");
+        return new CodebookItem(id, name, description, "string", "item", new HashMap<>());
     }
 
 
@@ -346,6 +347,9 @@ class Codebook {
         String description = getElementValue(conceptElement, "desc");
         String datatype = "";
 
+        // get the custom ART-DECOR properties for this item
+        Map<String, String> map = XMLUtils.getPropertyAttributeValues(conceptElement);
+
         // add the information from the terminologyAssociation tags to the Map.
         addTerminologyAssociations(conceptElement);
 
@@ -358,12 +362,12 @@ class Codebook {
         // attempt to find the terminology for the concept
         if(terminologyAssociationMap.containsKey(id)) {
             TerminologyElement terminologyElement = terminologyAssociationMap.get(id);
-            codebookItem = new CodebookItem(uniqueid, name, description, datatype, "item", terminologyElement.getCode(), terminologyElement.getCodeSystemName(), terminologyElement.getDisplayName());
+            codebookItem = new CodebookItem(uniqueid, name, description, datatype, "item", terminologyElement.getCode(), terminologyElement.getCodeSystemName(), terminologyElement.getDisplayName(), map);
         }
         else{
-            // a concept which itself does not have terminology although it's codelist can still have items
-            // which are e.g. SNOMED of course
-            codebookItem = new CodebookItem(uniqueid, name, description, datatype, "item");
+            // a concept which itself does not have terminology although its codelist can of course still have items
+            // which are e.g. SNOMED
+            codebookItem = new CodebookItem(uniqueid, name, description, datatype, "item", map);
         }
 
         // attempt to add a codelist to the item

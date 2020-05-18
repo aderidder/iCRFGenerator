@@ -23,7 +23,6 @@ import icrfgenerator.codebook.CodebookItem;
 import icrfgenerator.codebook.CodebookManager;
 import icrfgenerator.codebook.CodebookStructureNode;
 import icrfgenerator.edc.edc.edcspecificpane.EDCSpecificPane;
-import icrfgenerator.edc.edc.edcspecificpane.StateTracker;
 import icrfgenerator.gui.i18n.I18N;
 import icrfgenerator.settings.runsettings.RunSettings;
 import icrfgenerator.utils.GUIUtils;
@@ -38,9 +37,7 @@ import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.CheckBoxTreeCell;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Pane;
+import javafx.scene.layout.*;
 import org.controlsfx.control.CheckTreeView;
 
 import java.util.HashSet;
@@ -69,6 +66,17 @@ class LanguageTab extends Tab{
         setId(key);
         setClosable(false);
         setupLanguageTabContent();
+    }
+
+    /**
+     * update the Properties Dialog to show the properties of the item available in the StateTracker
+     * this ensures that the Properties Dialog's content properly updates when selecting:
+     * - a different codebook
+     * - a different language
+     * - a different item
+     */
+    void updatePropertiesDialogWindow(){
+        PropertiesDialog.updateWindow(stateTracker.getStateCodebookItem());
     }
 
     /**
@@ -105,6 +113,7 @@ class LanguageTab extends Tab{
         CheckTreeView<CodebookItem> checkTreeView = createItemTree(edcSpecificPane);
 
         TextField searchTextField = new TextField();
+
         // create the eventHandler which searches the tree based on the textfield's text content
         EventHandler<ActionEvent> actionEventEventHandler = e -> searchCheckTree((CheckBoxTreeItem<CodebookItem>) checkTreeView.getRoot(), searchTextField.getText());
         searchTextField.setOnAction(actionEventEventHandler);
@@ -118,17 +127,30 @@ class LanguageTab extends Tab{
         Hyperlink expandTreeLink = new Hyperlink(I18N.getLanguageText("languageTabExpand"));
         expandTreeLink.setOnAction(e->expandCheckTree(checkTreeView.getRoot()));
 
+        Hyperlink itemDetailsLink = new Hyperlink("Item details");
+        itemDetailsLink.setOnAction(e->PropertiesDialog.showWindow());
+
         // add everything to a gridpane
         GridPane gridPane = GUIUtils.createGridPane();
-        gridPane.setVgap(1);
+        gridPane.setPrefWidth(250);
         gridPane.setPadding(new Insets(10,0,0,0));
+        gridPane.setVgap(1);
         gridPane.setPrefHeight(page3.getPrefHeight());
-        gridPane.add(searchTextField, 0, 0, 2, 1);
-        gridPane.add(searchButton, 2, 0);
-        gridPane.add(expandTreeLink, 0, 1);
-        gridPane.add(collapseTreeLink, 1, 1);
-        gridPane.add(checkTreeView, 0,2,3,1);
 
+        // add the first row - the search textfield and the search button
+        gridPane.add(searchTextField, 0, 0);
+        gridPane.add(searchButton, 1, 0);
+
+        // add the second row - the hyperlinks
+        Label label = new Label("/");
+        label.setStyle("-fx-padding: 4 0 4 0");
+        HBox treeLinkBox = new HBox(expandTreeLink, label, collapseTreeLink);
+        treeLinkBox.setSpacing(3);
+        gridPane.add(treeLinkBox, 0,1);
+        gridPane.add(itemDetailsLink,1,1);
+
+        // add the third row - the item tree
+        gridPane.add(checkTreeView, 0,2,2,1);
         return gridPane;
     }
 
@@ -239,6 +261,8 @@ class LanguageTab extends Tab{
                         else {
                             stateTracker.highlightNonLeafNode(newValue.getValue(), edcSpecificPane);
                         }
+                        // update the Properties Dialog to reflect the newly selected item
+                        updatePropertiesDialogWindow();
                     }
                 });
     }

@@ -32,6 +32,7 @@
 
 .fillBackground{
     -fx-background-color: #689BCE;
+    -fx-background: #689BCE;
 }
 
 .fillBackgroundWhite{

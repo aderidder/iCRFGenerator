@@ -23,9 +23,7 @@ import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -45,19 +43,22 @@ public class CodebookItem {
     private String code;
     private String codeDescription;
 
+    // Map for this item's custom ART-DECOR properties
+    private Map<String, String> artDecorPropertiesMap;
+
     private List<CodelistItem> codelistItemList = new ArrayList<>();
 
     private List<String> toGenerateCodeListItemList = new ArrayList<>();
 
     public CodebookItem(String id, String itemName, String description, String nodeType){
-        this(id, itemName, description, "", nodeType, "", "", "");
+        this(id, itemName, description, "", nodeType, "", "", "", new HashMap<>());
     }
 
-    CodebookItem(String id, String itemName, String description, String dataType, String nodeType){
-        this(id, itemName, description, dataType, nodeType, "", "", "");
+    CodebookItem(String id, String itemName, String description, String dataType, String nodeType, Map<String, String> artDecorPropertiesMap){
+        this(id, itemName, description, dataType, nodeType, "", "", "", artDecorPropertiesMap);
     }
 
-    CodebookItem(String id, String itemName, String description, String dataType, String nodeType, String code, String codeSystem, String codeDescription){
+    CodebookItem(String id, String itemName, String description, String dataType, String nodeType, String code, String codeSystem, String codeDescription, Map<String, String> artDecorPropertiesMap){
         this.id = id;
         this.itemName = itemName;
         this.description = description;
@@ -67,13 +68,15 @@ public class CodebookItem {
         this.code = code;
         this.codeSystem = codeSystem;
         this.codeDescription = codeDescription;
+
+        this.artDecorPropertiesMap = artDecorPropertiesMap;
     }
 
     /**
      * if art-decor suggests the datatype is a codetype, we need to know whether this is integer or string, for e.g.
      * OpenClinica. this method attempts to convert a code to integer and if that fails, we know we're dealing with
      * strings.
-     * @param code
+     * @param code the code that could be an int or a string
      */
     private void guessCodeType(String code){
         if(codeDataType.equalsIgnoreCase("integer")) {
@@ -103,8 +106,21 @@ public class CodebookItem {
         return codelistItemList.stream().filter(t->t.code.equalsIgnoreCase(code)).findFirst().get().textvalue;
     }
 
+    /**
+     * get the codesystem for a code
+     * @param code code
+     * @return codesystem for the code
+     */
     String getCodesystemForCode(String code){
         return codelistItemList.stream().filter(t->t.code.equalsIgnoreCase(code)).findFirst().get().codeSystem;
+    }
+
+    /**
+     * returns the map with the custom ART-DECOR properties (property name - value)
+     * @return tha map with the custom ART-DECOR properties
+     */
+    public Map<String, String> getArtDecorPropertiesMap(){
+        return artDecorPropertiesMap;
     }
 
     /**

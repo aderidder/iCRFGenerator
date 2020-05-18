@@ -47,8 +47,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class XMLUtils {
     private static final Logger logger = LogManager.getLogger(XMLUtils.class.getName());
@@ -146,6 +145,23 @@ public class XMLUtils {
         }
         return elementsWithName;
     }
+
+    /**
+     * returns a map with all the custom properties ("property") defined in ART-DECOR
+     * @param element the element for which to find the custom property values
+     * @return the map with the properties and their values
+     */
+    public static Map<String, String> getPropertyAttributeValues(Element element){
+        Map<String, String> propertiesMap = new HashMap<>();
+        List<Element> propertyElementsList = getChildElementsWithName(element, "property");
+        for(Element propertyElement:propertyElementsList){
+            String attributeValue = getAttributeValue(propertyElement, "name");
+            propertiesMap.put(attributeValue, propertyElement.getTextContent().trim());
+         }
+        return propertiesMap;
+    }
+
+
 
     /**
      * returns the textcontent of a parent's child with a certain tag name
