@@ -67,6 +67,7 @@ class Codebook {
     private Map<String, String> codeSystemMap = new HashMap<>();
     private Map<String, TerminologyElement> terminologyAssociationMap = new HashMap<>();
 
+    private String codebookName;
     private String language;
     private CodebookStructureNode root;
 
@@ -79,6 +80,7 @@ class Codebook {
      * @param codebookName name of the codebook, e.g. Basisgegevensset Zorg 2017
      */
     Codebook(String datasetId, String language, String codebookName){
+        this.codebookName = codebookName;
         this.language = language;
         // create top node for keeping track of the tree structure of the codebook
         root =  new CodebookStructureNode(new CodebookItem("-1", codebookName, codebookName, "group"));
@@ -86,7 +88,7 @@ class Codebook {
         groupIsAnItem = GlobalSettings.groupIsAnItem(codebookName);
 
         // Get the XML file and create a codebook for it
-        File xmlFile = getXMLFile(datasetId, language);
+        File xmlFile = getXMLFile(codebookName, datasetId, language);
         Element rootElement = getRootElement(xmlFile);
         createBook(rootElement, root);
     }
@@ -107,13 +109,10 @@ class Codebook {
      * @param datasetId    id of the dataset, e.g. 2.16.840.1.113883.2.4.3.11.60.42.1.1
      * @param language     language of interest of the dataset, e.g. nl-NL
      */
-    private static File getXMLFile(String datasetId, String language){
+    private static File getXMLFile(String codebookName, String datasetId, String language){
         // check whether the cache dir exists; if not, we create it
-        String dir = ".\\cache\\";
-        File fileDir = new File(dir);
-        if(!fileDir.exists()){
-            fileDir.mkdir();
-        }
+        String dir = GlobalSettings.getCacheDir()+File.separator;
+
         // generate the file name and check whether it exists in the cache
         String fileName = dir+datasetId+language+".xml";
         File dataFile = new File(fileName);
@@ -121,7 +120,7 @@ class Codebook {
             // check whether the file exists and download it if it doesn't
             // this is time-consuming, as Art-Decor is pretty slow in generating this file; hence we're saving it locally
             if(!dataFile.exists()){
-                downloadXMLFile(datasetId, language, fileName);
+                downloadXMLFile(codebookName, datasetId, language, fileName);
             }
             logger.log(Level.INFO, "Opening the codebook xml file: "+dataFile.getName());
             return dataFile;
@@ -259,7 +258,7 @@ class Codebook {
         String datasetId = element.getAttribute("datasetId");
 
         // get the xml file for the referred dataset and the rootelement
-        File xmlFile = getXMLFile(datasetId, language);
+        File xmlFile = getXMLFile(codebookName, datasetId, language);
         Element rootElement = getRootElement(xmlFile);
 
         // use xpath to quickly find our element of interest and return it

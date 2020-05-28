@@ -102,9 +102,9 @@ class CodebookMetaData {
      */
     private void retrieveMetaData(){
         // retrieve the codebook's prefix, which we need to generate the URI
-        String protocolPrefix = GlobalSettings.getProtocolPrefix(codebook);
+        String codebookPrefix = GlobalSettings.getCodebookPrefix(codebook);
 
-        String uri = ArtDecorCalls.getProjectIndexURI(protocolPrefix);
+        String uri = ArtDecorCalls.getProjectIndexURI(codebook, codebookPrefix);
         logger.log(Level.INFO, "Attempting to retrieve which version of codebook {} are available using {}", codebook, uri);
 
         try {
@@ -166,7 +166,7 @@ class CodebookMetaData {
 
 //    private void retrieveMetaData(){
 //        // retrieve the codebook's prefix, which we need to generate the URI
-//        String protocolPrefix = GlobalSettings.getProtocolPrefix(codebook);
+//        String protocolPrefix = GlobalSettings.getCodebookPrefix(codebook);
 //
 //        String uri = ArtDecorCalls.getProjectIndexURI(protocolPrefix);
 //        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -228,7 +228,7 @@ class CodebookMetaData {
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Element descElement = (Element) nodeList.item(i);
                 String language = descElement.getAttribute("language");
-                if(!GlobalSettings.isLowQualityProtocolLanguage(codebook, language)) {
+                if(!GlobalSettings.isLowQualityCodebookLanguage(codebook, language)) {
                     languages.add(language);
                 }
                 else{

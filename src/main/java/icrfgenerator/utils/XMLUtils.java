@@ -59,8 +59,8 @@ public class XMLUtils {
      * @param fileName filename whence we will write the downloaded file
      * @throws IOException exception
      */
-    public static void downloadXMLFile(String datasetId, String language, String fileName) throws IOException{
-        String uri = ArtDecorCalls.getRetrieveDatasetURI(datasetId,language);
+    public static void downloadXMLFile(String codebookName, String datasetId, String language, String fileName) throws IOException{
+        String uri = ArtDecorCalls.getRetrieveDatasetURI(codebookName, datasetId,language);
         logger.log(Level.INFO, "Retrieving a codebook using "+uri);
 
         // open a url connection

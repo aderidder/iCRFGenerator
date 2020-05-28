@@ -37,7 +37,7 @@ public class ResourceManager {
      * @param resource    the requested resource
      * @return the resource as an inputstream
      */
-    private static InputStream getResourceAsStream(String resource) {
+    public static InputStream getResourceAsStream(String resource) {
         return ResourceManager.class.getResourceAsStream(resource);
     }
 

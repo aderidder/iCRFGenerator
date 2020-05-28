@@ -24,7 +24,19 @@ At this moment the following ART-DECOR codebooks are available:
 4.	Cancer Core Europe 
 5.	The PALGA Colon biopsy protocol
 6.	The PALGA Colorectum carcinoma protocol
+7.  The VASCA codebook. A codebook for rare diseases registries based on the JRC common data elements set and the EJPRD semantic model applied to the Registry of Vascular Anomalies (VASCA) use case.
 
+### Custom Codebooks
+If you wish to use the iCRF Generator for ART-DECOR codebooks that are not currently available in the standard set of available codebooks, please do the following:
+*  Go to the cache directory
+    *  If this directory does not yet exist, start the iCRF Generator and close it again - starting it will create the directory 
+*  Open the file "codebooks.txt" in your favorite editor
+*  Add the codebook following the format described in the codebooks.txt file
+*  Start the iCRF Generator
+*  Page 2, the page that allows you to select codebooks, should now show your newly added codebook
+    * If it does not, ask for help
+    
+Please be aware that I cannot guarantee that iCRF Generator is compatible with every codebook available in ART-DECOR!  
 
 ## Running the program
 If you downloaded the distribution ZIP file, it comes provided with its own JRE. The next sections show how to start the application for Windows and Mac.  

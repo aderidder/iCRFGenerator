@@ -1,0 +1,25 @@
+# Warning: do not delete this file or the program will fail on startup!
+#
+# In this file you can add / remove codebooks. 
+# Required:
+# name - the name as it will appear on e.g. page 1
+# prefix - the codebook's prefix. This is used to actually find the codebook in ART-DECOR
+# server - the ART-DECOR server
+# group is item - whether, when the codebook uses a parent-children structure, the parent should be considered an item
+# 
+# Optional:
+# skip language - whether a language should not be included, e.g. due to low quality. Multiple languages should be separated with a comma, e.g.: en-US, en-GB
+#
+# format:
+# name<tab>prefix<tab>server<tab>group_is_item<tab>skip_language
+#
+# example:
+# Basisgegevenssset Zorg 2017	bgz2017-	http://decor.nictiz.nl/services/	false
+#
+RIVM bevolkingsonderzoeken		rivmsp-		http://decor.nictiz.nl/services/	false	en-US
+PALGA Colonbiopt Protocol		ppcolbio-	http://decor.nictiz.nl/services/	false
+PALGA Colonrectum Carcinoom Protocol	ppcolcar-	http://decor.nictiz.nl/services/	false
+Cancer Core Europe			cce-		http://decor.nictiz.nl/services/	true
+Zorginformatiebouwstenen 2017		zib2017bbr-	http://decor.nictiz.nl/services/	false
+Basisgegevenssset Zorg 2017		bgz2017-	http://decor.nictiz.nl/services/	false
+VASCA					vasca-		http://decor.nictiz.nl/services/	false

@@ -27,22 +27,24 @@ import icrfgenerator.settings.GlobalSettings;
 public class ArtDecorCalls {
     /**
      * returns the URI to retrieve a dataset (codebook) for the specific language
+     * @param codebook     name of the codebook, necessary to determine the server
      * @param datasetId    identifier of the dataset to retrieve
      * @param langFrom     language of the source data
      * @return the URI that can be used to retrieve the dataset
      */
-    static String getRetrieveDatasetURI(String datasetId, String langFrom){
-        return GlobalSettings.server+"RetrieveDataSet?id="+datasetId+"&language="+langFrom+"&format=xml";
+    static String getRetrieveDatasetURI(String codebook, String datasetId, String langFrom){
+        return GlobalSettings.getServer(codebook)+"RetrieveDataSet?id="+datasetId+"&language="+langFrom+"&format=xml";
     }
 
     /**
      * returns the URI to retrieve project information, which contains information on which
      * dataset version are available, as well as their dataset identifiers
      * this information we can then use to retrieve the dataset (=codebook)
+     * @param codebook     name of the codebook, necessary to determine the server
      * @param prefix    prefix of the codebook
      * @return  URI which contains project information
      */
-    public static String getProjectIndexURI(String prefix){
-        return GlobalSettings.server+"ProjectIndex?view=d&prefix="+prefix+"&format=xml";
+    public static String getProjectIndexURI(String codebook, String prefix){
+        return GlobalSettings.getServer(codebook)+"ProjectIndex?view=d&prefix="+prefix+"&format=xml";
     }
 }

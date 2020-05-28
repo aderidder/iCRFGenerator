@@ -25,11 +25,6 @@ import javafx.application.Application;
 import javafx.stage.Stage;
 
 class CRFGenerator {
-    // TODO:
-    //  * improve the "low quality codebook" setting
-    //  Maybe:
-    //  * improve page 2... add sections or tabs? e.g. "General", "PALGA Codebooks"
-    //  * add e.g. "Required" to OC3 right-side pane
 
     public static void main(String [] args) {
         Application.launch(StartApplication.class, args);
