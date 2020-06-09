@@ -35,7 +35,7 @@ public class GlobalSettings {
     private static final String cacheDirName = "."+File.separator+"cache";
     private static final String codebookFileName = "codebooks.txt";
 
-    private static final List<String> edcList = Arrays.asList("REDCap", "OpenClinica 3", "Castor - Step", "Castor - Report", "Castor - Survey");
+    private static final List<String> edcList = Arrays.asList("REDCap", "OpenClinica 3", "Castor - Step", "Castor - Report", "Castor - Survey", "Molgenis EMX");
     private static final List<String> uiLanguages = Arrays.asList("en", "nl");
 
     // timeout settings; 5000 is 5 seconds.
