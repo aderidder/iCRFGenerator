@@ -120,7 +120,18 @@ public class Page3 extends WizardPane {
         String key = codebook+datasetId;
         String version = codebookManager.getDatasetVersion(codebook, datasetId);
         String datasetName = codebookManager.getDatasetName(codebook, datasetId);
-        Tab tab = new Tab(datasetName+" "+version);
+
+        Tab tab = new Tab();
+        if(datasetName.length()>40) {
+            tab.setText(datasetName.substring(0,37)+"..."+" "+version);
+            tab.setTooltip(new Tooltip(datasetName));
+//            GUIUtils.addTooltip(tab, datasetName);
+        }
+        else{
+            tab = new Tab(datasetName+" "+version);
+        }
+
+//        Tab tab = new Tab(datasetName+" "+version);
         tab.setId(key);
         tab.setClosable(false);
         tab.setContent(new TabPane());

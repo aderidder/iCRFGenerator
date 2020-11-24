@@ -74,6 +74,10 @@ public class ItemDetails{
         codesList.remove(code);
     }
 
+    void removeSelectedTerminologyCode(){
+        codesList.clear();
+    }
+
     /**
      * get a list with the selected terminology codes
      * @return List with the selected terminology codes

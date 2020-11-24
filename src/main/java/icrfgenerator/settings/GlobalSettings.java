@@ -42,7 +42,7 @@ public class GlobalSettings {
     private static final int metaDataConnectionTimeout = 5000;
     private static final int metaDataReadTimeout = 15000;
     private static final int codebookConnectionTimeout = 5000;
-    private static final int codebookReadTimeout = 45000;
+    private static final int codebookReadTimeout = 120000;
 
     private static final List<String> lowQualityCodebookLanguageCombinations = new ArrayList<>();
     private static final Map<String, Source> codebookNameToSourceMap = new TreeMap<>();

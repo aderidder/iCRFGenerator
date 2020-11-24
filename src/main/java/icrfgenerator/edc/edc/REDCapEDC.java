@@ -26,6 +26,7 @@ import icrfgenerator.edc.edc.edcspecificpane.REDCapSpecificPane;
 import icrfgenerator.resourcemanagement.ResourceManager;
 import icrfgenerator.settings.runsettings.RunSettings;
 import icrfgenerator.edc.edc.edcrunsettings.redcap.REDCapRunSettings;
+import icrfgenerator.utils.GUIUtils;
 import icrfgenerator.utils.StringUtils;
 import javafx.stage.FileChooser;
 
@@ -171,7 +172,7 @@ public class REDCapEDC extends EDCDefault{
         // loop over the codes
         for(String code:selectedCodeValues){
             // retrieve the label for a code and create the redcap codelist format
-            stringBuilder.append(code).append(", ").append(codebookManager.getValueForCode(key, itemId, code)).append(" | ");
+            stringBuilder.append(code).append(", ").append(codebookManager.getValueForCode(key, itemId, code).replaceAll("\"", "'")).append(" | ");
         }
 
         // delete the trailing " | "

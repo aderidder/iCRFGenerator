@@ -260,6 +260,10 @@ public abstract class RunSettings{
         selectedItemsContainerForCodebookDatasetLanguageMap.get(key).removeTerminology(itemId, code);
     }
 
+    public void removeSelectedItemTerminologies(String key, String itemId){
+        selectedItemsContainerForCodebookDatasetLanguageMap.get(key).removeTerminologies(itemId);
+    }
+
     /**
      * returns the list of the terminology codes selected for an item
      * @param key codebook+datasetId+language

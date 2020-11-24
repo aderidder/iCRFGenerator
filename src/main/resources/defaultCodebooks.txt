@@ -22,4 +22,6 @@ PALGA Colonrectum Carcinoom Protocol	ppcolcar-	http://decor.nictiz.nl/services/	
 Cancer Core Europe			cce-		http://decor.nictiz.nl/services/	true
 Zorginformatiebouwstenen 2017		zib2017bbr-	http://decor.nictiz.nl/services/	false
 Basisgegevenssset Zorg 2017		bgz2017-	http://decor.nictiz.nl/services/	false
+Basisgegevenssset Zorg 2020		zib2020bbr-	http://decor.nictiz.nl/services/	false
 VASCA					vasca-		http://decor.nictiz.nl/services/	false
+FAIRGenomes		fairgenomes-		http://decor.nictiz.nl/services/		false

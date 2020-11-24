@@ -19,6 +19,7 @@
 
 package icrfgenerator.gui.wizard;
 
+import icrfgenerator.edc.edc.edcspecificpane.edccodelistpane.CodelistPane;
 import icrfgenerator.gui.i18n.I18N;
 import icrfgenerator.gui.wizard.page1.Page1;
 import icrfgenerator.gui.wizard.page2.Page2;
@@ -78,5 +79,6 @@ public class GUIWizard {
         Page1.reset();
         Page2.reset();
         Page3.reset();
+        CodelistPane.reset();
     }
 }

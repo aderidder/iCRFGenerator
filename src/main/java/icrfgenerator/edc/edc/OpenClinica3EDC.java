@@ -29,6 +29,9 @@ import icrfgenerator.settings.runsettings.RunSettings;
 import icrfgenerator.edc.edc.edcrunsettings.openclinica3.OpenClinica3RunSettings;
 import icrfgenerator.utils.StringUtils;
 import javafx.stage.FileChooser;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -48,6 +51,8 @@ public class OpenClinica3EDC extends EDCDefault{
     private static final String sectionLabel="Section1";
     private static final int nrCellsOnItemsSheet = 27;
     private static final int nrCellsOnSectionsSheet = 6;
+
+    private static final Logger logger = LogManager.getLogger(OpenClinica3EDC.class.getName());
 
     public OpenClinica3EDC(){
         super("OpenClinica 3");
@@ -232,11 +237,19 @@ public class OpenClinica3EDC extends EDCDefault{
      */
     private void addTerminologyValues(Row row, String itemName, String fieldType, String codes, String values){
         row.getCell(ItemColumns.RESPONSE_LABEL.index).setCellValue(fieldType+"_"+ StringUtils.removeSpacesFromString(itemName));
-        row.getCell(ItemColumns.RESPONSE_OPTIONS_TEXT.index).setCellValue(values);
-        row.getCell(ItemColumns.RESPONSE_VALUES_OR_CALCULATIONS.index).setCellValue(codes);
+        row.getCell(ItemColumns.RESPONSE_OPTIONS_TEXT.index).setCellValue(checkLength(itemName, values));
+        row.getCell(ItemColumns.RESPONSE_VALUES_OR_CALCULATIONS.index).setCellValue(checkLength(itemName, codes));
         if(OpenClinica3Definition.isFieldTypeWithDefault(fieldType)) {
             row.getCell(ItemColumns.DEFAULT_VALUE.index).setCellValue("(select)");
         }
+    }
+
+    private static String checkLength(String itemName, String value){
+        if(value.length()>32766){
+            logger.log(Level.ERROR, itemName+" has codes/values that exceed Excel's maximum field length. Please select fewer options...");
+            return "Too long, sorry...";
+        }
+        return value;
     }
 
     /**

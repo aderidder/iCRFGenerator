@@ -303,9 +303,13 @@ abstract class EDCSpecificPaneDefault implements EDCSpecificPane {
      */
     private void setupCenterPane(){
         codelistPane = new CodelistPane(key, codebookItem);
-        ScrollPane scrollPane = new ScrollPane(codelistPane);
-        scrollPane.setPadding(new Insets(5,0,15,0));
-        borderPane.setCenter(scrollPane);
+//        ScrollPane scrollPane = new ScrollPane(codelistPane);
+//        scrollPane.setPadding(new Insets(5,0,15,0));
+//        borderPane.setCenter(codelistPane.getView());
+        borderPane.setCenter(codelistPane);
+
+//        codelistPane = new CodelistPane(key, codebookItem, borderPane);
+
     }
 
     /**

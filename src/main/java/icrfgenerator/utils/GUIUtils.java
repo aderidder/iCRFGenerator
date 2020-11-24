@@ -28,6 +28,7 @@ import javafx.scene.control.Tooltip;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.text.Text;
 import org.controlsfx.control.CheckComboBox;
 
 import java.util.List;
@@ -72,6 +73,12 @@ public class GUIUtils {
         Label label = new Label(labelText);
         label.setWrapText(true);
         label.setPrefWidth(prefWidth);
+        return label;
+    }
+
+    public static Text createWrappedText(String labelText, int prefWidth){
+        Text label = new Text(labelText);
+        label.setWrappingWidth(prefWidth);
         return label;
     }
 

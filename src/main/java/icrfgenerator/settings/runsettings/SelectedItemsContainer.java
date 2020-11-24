@@ -77,6 +77,10 @@ public abstract class SelectedItemsContainer {
         itemDetailsMap.get(itemId).removeSelectedTerminologyCode(code);
     }
 
+    void removeTerminologies(String itemId){
+        itemDetailsMap.get(itemId).removeSelectedTerminologyCode();
+    }
+
     /**
      * add the item the user just selected
      * @param itemId id of item

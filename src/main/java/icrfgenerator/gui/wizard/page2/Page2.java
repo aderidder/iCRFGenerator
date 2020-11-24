@@ -190,7 +190,15 @@ public class Page2 extends WizardPane {
             String datasetDate = codebookManager.getDatasetEffectiveDate(codebook, datasetIdentifier);
 
             // create a checkbox
-            CheckBox checkBox = new CheckBox(datasetName+" - "+datasetVersion+" ("+datasetDate+")");
+            CheckBox checkBox = new CheckBox();
+            if(datasetName.length()>60) {
+                checkBox.setText(datasetName.substring(0,59)+"..."+" - "+datasetVersion+" ("+datasetDate+")");
+                GUIUtils.addTooltip(checkBox, datasetName);
+            }
+            else{
+                checkBox.setText(datasetName+" - "+datasetVersion+" ("+datasetDate+")");
+            }
+
             checkBox.setId(datasetIdentifier);
 
             // and a language selected combobox

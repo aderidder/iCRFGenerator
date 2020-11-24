@@ -8,6 +8,14 @@ By using the definitions from such codebooks, a user ensures interoperability wi
 
 ***Learn more about the iCRF Generator in the [publication](https://f1000research.com/articles/9-81). If you use the iCRF Generator for your project, please cite the paper!*** 
 
+## News
+The 1.2 release includes the following changes:
+* **Fix for the Mac Catalina gatekeeper issue** See the Running the program chapter below for updated Mac instructions. Let us know if it doesn't work!
+* Support for EMX model output, allowing you to use the iCRF Generator for e.g. Molgenis Catalogue
+* Updated the codelist selection panel, which had some performance issues
+* Added new codebooks, such as the 2020 ZIBs
+* Increased the number of seconds before a timeout occurs. Issue here is that the current version of the FAIRGenomes codebook is just very big, taking ART-DECOR about 1.5 minutes to generate. After the first time it will of course be cached locally.  
+
 ## Supported EDCs
 Currently the program can create a core file for:
 * Castor EDC: creates an XML file which you can import in Castor, after which you can manually tweak it
@@ -25,6 +33,8 @@ At this moment the following ART-DECOR codebooks are available:
 5.	The PALGA Colon biopsy protocol
 6.	The PALGA Colorectum carcinoma protocol
 7.  The VASCA codebook. A codebook for rare diseases registries based on the JRC common data elements set and the EJPRD semantic model applied to the Registry of Vascular Anomalies (VASCA) use case.
+8.  **NEW: FAIRGenomes codebook**
+9.  **NEW: The Clinical Building Blocks 2020 release**
 
 ### Custom Codebooks
 If you wish to use the iCRF Generator for ART-DECOR codebooks that are not currently available in the standard set of available codebooks, please do the following:
@@ -47,17 +57,12 @@ the downloaded XML file locally in the cache directory, so subsequent loading of
 Unpack the file and double-click on runme.bat
 
 ### Mac
-Unpack the file and double-click the runme.command file. If it doesn't run, your security settings are probably blocking it. If that's the case, you can try to start the program manually:
-* Open a terminal (press Command - spacebar to launch Spotlight and type "Terminal")
-* Go to the directory where you unpacked the file
-* Verify that you're in the right directory, by checking that it contains at least:
-    * a directory "java-runtime"
-    * a directory "lib"
-    * a jar file "GenerateCRF.jar"
-* Paste the following command and press enter:  
-  `java-runtime/bin/java --add-opens javafx.graphics/javafx.scene=ALL-UNNAMED -cp GenerateCRF.jar:./lib/* generatecrf.GenerateCRF`
+First time: 
+Unpack the file and ***right-click*** the runme.command file and select ***open***
 
-NOTE: The software was tested on Mac OS El Capitan. With Mac OS Catalina Apple has made some security changes. This effect is that, unfortunately, the out of the box solution presented above does not work anymore. We are looking into this.
+Subsequent runs:
+Double-click the runme.command file.
+
 
 ## Some limitations
 * The iCRF Generator aims at generating items, so additional details (such as sections, repeating groups, etc) will have to be added manually.
