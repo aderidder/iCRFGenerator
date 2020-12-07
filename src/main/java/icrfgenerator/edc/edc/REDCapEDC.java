@@ -32,12 +32,15 @@ import javafx.stage.FileChooser;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 /**
  * REDCap EDC
- * Kind of untested at the moment as I don't have a REDCap server
  *
  * The columns of a redcap csv are:
  * Variable / Field Name *
@@ -56,6 +59,7 @@ import java.util.stream.Collectors;
  * Custom Alignment
  * Question Number (surveys only)
  * Matrix Group Name
+ * Field Annotation
  */
 public class REDCapEDC extends EDCDefault{
     private List<String> lines = new ArrayList<>();
@@ -117,7 +121,8 @@ public class REDCapEDC extends EDCDefault{
                 String itemName = codebookItem.getItemName();
                 // check whether the selected item can have an associated codelist
                 if (codebookManager.codebookItemHasCodeList(key, itemId)) {
-                    createTerminologyRow(itemName, fieldType, formatCodesValues(key, itemId));
+                    String [] formatValues = formatCodesValues(key, itemId);
+                    createTerminologyRow(itemName, fieldType, formatValues[0], formatValues[1]);
                 }
                 else {
                     createNonTerminologyRow(itemName, fieldType, textValidationType, minValue, maxValue);
@@ -159,27 +164,61 @@ public class REDCapEDC extends EDCDefault{
 
     /**
      * create a redcap string representation of the codes + labels for an item
+     * this now also includes a detection for :// (as used by e.g. http://) to remove the link, as redcap
+     * dislikes special characters in its code field. Instead, the link is now added to the annotation field
      * @param key codebook + datasetId + language
      * @param itemId id of the item
-     * @return a string for the codelist
+     * @return a string array with the formatted codelist string and an annotation string
      */
-    private String formatCodesValues(String key, String itemId){
+    private String[] formatCodesValues(String key, String itemId){
+        String [] formatted = new String [2];
         CodebookManager codebookManager = CodebookManager.getInstance();
         StringBuilder stringBuilder = new StringBuilder();
         // retrieve the selected terminology codes for the item
         List<String> selectedCodeValues = RunSettings.getInstance().getSelectedItemSelectedTerminologyCodes(key, itemId);
 
+        Map<String, String> linkMap = new HashMap<>();
+
         // loop over the codes
         for(String code:selectedCodeValues){
+            String codesystem="";
+            String label = codebookManager.getValueForCode(key, itemId, code).replaceAll("\"", "'");
+
+            Pattern pattern = Pattern.compile("(.*/\\W*)(\\w+)");
+            Matcher matcher = pattern.matcher(code);
+            if(matcher.matches()){
+                // fetch the codesystem for the code, split the code into the link part and its normal code.
+                codesystem = codebookManager.getCodesystemForCode(key, itemId, code);
+                codesystem = codesystem.replaceAll("\\W", "");
+                String link = matcher.group(1);
+                code = matcher.group(2);
+                // store in the linkmap
+                linkMap.put(codesystem, codesystem+":"+link);
+                codesystem+="_";
+            }
+
+            code = code.replaceAll("\\W", "");
             // retrieve the label for a code and create the redcap codelist format
-            stringBuilder.append(code).append(", ").append(codebookManager.getValueForCode(key, itemId, code).replaceAll("\"", "'")).append(" | ");
+            stringBuilder.append(codesystem).append(code).append(", ").append(label).append(" | ");
+
         }
 
         // delete the trailing " | "
         if(stringBuilder.length()>0) {
             stringBuilder.delete(stringBuilder.length() - 3, stringBuilder.length());
         }
-        return stringBuilder.toString();
+
+        // add the formatted string to the array
+        formatted[1] = linkMap.size()>0 ? String.join(" | ", linkMap.values()):"";
+//        if(linkMap.size()>0){
+//            formatted[1] = String.join(" | ", linkMap.values());
+//        }
+//        else{
+//            formatted[1] = String.join(" | ", linkMap.values());
+//        }
+
+        formatted[0] = stringBuilder.toString();
+        return formatted;
     }
 
     /**
@@ -188,8 +227,8 @@ public class REDCapEDC extends EDCDefault{
      * @param fieldType fieldtype of the item
      * @param codesValuesString codes & values string of the codelist
      */
-    private void createTerminologyRow(String itemName, String fieldType, String codesValuesString){
-        lines.add(StringUtils.addQuotationMarks(StringUtils.removeSpacesFromString(itemName)).toLowerCase() +","+formName+",,"+fieldType+","+ StringUtils.addQuotationMarks(itemName)+","+ StringUtils.addQuotationMarks(codesValuesString)+",,,,,,,,,,");
+    private void createTerminologyRow(String itemName, String fieldType, String codesValuesString, String annotation){
+        lines.add(StringUtils.addQuotationMarks(StringUtils.removeSpacesFromString(itemName)).toLowerCase() +","+formName+",,"+fieldType+","+ StringUtils.addQuotationMarks(itemName)+","+ StringUtils.addQuotationMarks(codesValuesString)+",,,,,,,,,,,,"+StringUtils.addQuotationMarks(annotation));
     }
 
     /**
@@ -198,6 +237,6 @@ public class REDCapEDC extends EDCDefault{
      * @param fieldType fieldtype of the item
      */
     private void createNonTerminologyRow(String itemName, String fieldType, String textValidationType, String minValue, String maxValue){
-        lines.add(StringUtils.addQuotationMarks(StringUtils.removeSpacesFromString(itemName)).toLowerCase()+","+formName+",,"+fieldType+","+ StringUtils.addQuotationMarks(itemName)+",,,"+textValidationType+","+minValue+","+maxValue+",,,,,,");
+        lines.add(StringUtils.addQuotationMarks(StringUtils.removeSpacesFromString(itemName)).toLowerCase()+","+formName+",,"+fieldType+","+ StringUtils.addQuotationMarks(itemName)+",,,"+textValidationType+","+minValue+","+maxValue+",,,,,,,,");
     }
 }
