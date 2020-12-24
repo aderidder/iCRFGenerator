@@ -22,9 +22,13 @@ package icrfgenerator.gui;
 import icrfgenerator.gui.i18n.I18N;
 import icrfgenerator.resourcemanagement.ResourceManager;
 import icrfgenerator.settings.GlobalSettings;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.StageStyle;
@@ -39,8 +43,9 @@ class SettingsWindow extends Dialog{
     private static final double prefWidth = 475;
     private static final double prefHeight = 200;
 
-    private Label setLanguageLabel;
+    private Label setLanguageLabel, readTimeoutLabel;
     private ComboBox <IdLanguage> languageComboBox;
+    private TextField readTimeoutTextField;
 
     private SettingsWindow (){
         createDialog();
@@ -62,7 +67,7 @@ class SettingsWindow extends Dialog{
         getDialogPane().getStyleClass().add("fillBackground");
 
         // add an ok button
-        getDialogPane().getButtonTypes().addAll(ButtonType.OK);
+        getDialogPane().getButtonTypes().add(ButtonType.OK);
 
         // set the content of the dialog
         getDialogPane().setContent(createPane());
@@ -81,6 +86,7 @@ class SettingsWindow extends Dialog{
         setLanguageLabel.setText(I18N.getLanguageText(setLanguageLabel.getId()));
         // update the textual representation of the languages in the combobox
         languageComboBox.getItems().forEach(t->t.updateLanguage());
+        readTimeoutLabel.setText(I18N.getLanguageText(readTimeoutLabel.getId()));
     }
 
     /**
@@ -111,24 +117,41 @@ class SettingsWindow extends Dialog{
     private Node createPane(){
         VBox vBox = new VBox();
 
+        // language fields
         setLanguageLabel = new Label();
         setLanguageLabel.setPrefWidth(200);
         setLanguageLabel.setId("settingsSetLanguage");
         setupLanguageComboBox();
 
-        // add all the elements to an horizontal box
-        HBox hBox = new HBox();
-        hBox.setSpacing(5);
-        hBox.getStyleClass().add("fillBackground");
-        hBox.getChildren().addAll(setLanguageLabel, languageComboBox);
-        hBox.setAlignment(Pos.TOP_LEFT);
-
         // add a listener to register a change to the selected language
         addLanguageChangeListener();
 
-        vBox.getChildren().addAll(hBox);
+        // read timeout fields
+        readTimeoutLabel = new Label("timeout in seconds");
+        readTimeoutLabel.setPrefWidth(200);
+        readTimeoutLabel.setId("readTimeOut");
+
+        readTimeoutTextField = new IntField(GlobalSettings.getCodebookReadTimeout()/1000);
+        readTimeoutTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if(newValue.equalsIgnoreCase("")) newValue = "0";
+            GlobalSettings.setCodebookReadTimeout(Integer.parseInt(newValue));
+        });
+
+
+        vBox.getChildren().addAll(getHBox(setLanguageLabel, languageComboBox), getHBox(readTimeoutLabel, readTimeoutTextField));
         return vBox;
     }
+
+    private HBox getHBox(Node ... nodes){
+        HBox hBox = new HBox();
+        hBox.setSpacing(5);
+        hBox.getStyleClass().add("fillBackground");
+        hBox.getChildren().addAll(nodes);
+        hBox.setAlignment(Pos.TOP_LEFT);
+        return hBox;
+    }
+
+
 
     /**
      * Add listener to the language combobox
@@ -186,4 +209,17 @@ class SettingsWindow extends Dialog{
             }
         }
     }
+
+    class IntField extends TextField {
+        IntField(int initialValue) {
+            setText(Integer.toString(initialValue));
+
+            this.addEventFilter(KeyEvent.KEY_TYPED, keyEvent -> {
+                if (!"0123456789".contains(keyEvent.getCharacter())) {
+                    keyEvent.consume();
+                }
+            });
+        }
+    }
+
 }

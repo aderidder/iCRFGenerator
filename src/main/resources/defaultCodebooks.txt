@@ -16,12 +16,13 @@
 # example:
 # Basisgegevenssset Zorg 2017	bgz2017-	http://decor.nictiz.nl/services/	false
 #
-RIVM bevolkingsonderzoeken		rivmsp-		http://decor.nictiz.nl/services/	false	en-US
+Basisgegevenssset Zorg 2017		bgz2017-	http://decor.nictiz.nl/services/	false
+CBS doodsoorzakenstatistiek		cbs-dstat-		http://decor.nictiz.nl/services/		false
+FAIRGenomes		fairgenomes-		http://decor.nictiz.nl/services/		false
+Labuitwisseling			lu-		http://decor.nictiz.nl/services/	false
 PALGA Colonbiopt Protocol		ppcolbio-	http://decor.nictiz.nl/services/	false
 PALGA Colonrectum Carcinoom Protocol	ppcolcar-	http://decor.nictiz.nl/services/	false
-Cancer Core Europe			cce-		http://decor.nictiz.nl/services/	true
-Zorginformatiebouwstenen 2017		zib2017bbr-	http://decor.nictiz.nl/services/	false
-Basisgegevenssset Zorg 2017		bgz2017-	http://decor.nictiz.nl/services/	false
-Basisgegevenssset Zorg 2020		zib2020bbr-	http://decor.nictiz.nl/services/	false
+RIVM bevolkingsonderzoeken		rivmsp-		http://decor.nictiz.nl/services/	false	en-US
 VASCA					vasca-		http://decor.nictiz.nl/services/	false
-FAIRGenomes		fairgenomes-		http://decor.nictiz.nl/services/		false
+Zorginformatiebouwstenen 2017		zib2017bbr-	http://decor.nictiz.nl/services/	false
+Zorginformatiebouwstenen 2020		zib2020bbr-	http://decor.nictiz.nl/services/	false

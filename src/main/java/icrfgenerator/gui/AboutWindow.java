@@ -21,6 +21,7 @@ package icrfgenerator.gui;
 
 import icrfgenerator.gui.i18n.I18N;
 import icrfgenerator.resourcemanagement.ResourceManager;
+import icrfgenerator.utils.GUIUtils;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -125,30 +126,30 @@ class AboutWindow extends Dialog{
         grid.setPadding(new Insets(10,0,0,0));
 
         // first row
-        ImageView vumcImv = getImageView(height,2*width,"vumc_white.png");
+        ImageView vumcImv = GUIUtils.getImageView(height,2*width,"vumc_white.png");
         grid.add(vumcImv,0,0,2,1);
 
-        ImageView antonieImv = getImageView(height,2*width,"nki_white.png");
+        ImageView antonieImv = GUIUtils.getImageView(height,2*width,"nki_white.png");
         grid.add(antonieImv,2,0,2,1);
 
-        ImageView lygatureImv = getImageView(height,2*width,"lygature_white.png");
+        ImageView lygatureImv = GUIUtils.getImageView(height,2*width,"lygature_white.png");
         grid.add(lygatureImv,4,0,2,1);
 
-        ImageView kwfImv = getImageView(height,2*width,"kwf_white.png");
+        ImageView kwfImv = GUIUtils.getImageView(height,2*width,"kwf_white.png");
         grid.add(kwfImv,6,0,2,1);
 
         // second row...
-        ImageView nictizImv = getImageView(height,2*width,"nictiz_white.png");
+        ImageView nictizImv = GUIUtils.getImageView(height,2*width,"nictiz_white.png");
         grid.add(nictizImv,0,1,2,1);
 
-        ImageView aumcImv = getImageView(height,5*width,"aumc_white.png");
+        ImageView aumcImv = GUIUtils.getImageView(height,5*width,"aumc_white.png");
         grid.add(aumcImv,2,1,5,1);
 
-        ImageView bbmriImv = getImageView(height,2*width,"bbmri_white.png");
+        ImageView bbmriImv = GUIUtils.getImageView(height,2*width,"bbmri_white.png");
         grid.add(bbmriImv,6,1,2,1);
 
         // third row
-        ImageView healthriImv = getImageView(height,3*width,"healthri_white_small.png");
+        ImageView healthriImv = GUIUtils.getImageView(height,3*width,"healthri_white_small.png");
         grid.add(healthriImv,0,2,3,1);
 
         // give the grid an id and add styleclass
@@ -157,18 +158,4 @@ class AboutWindow extends Dialog{
         return grid;
     }
 
-    /**
-     * helper for creating an imageview
-     * @param height heigth
-     * @param width width
-     * @param image string name of the image
-     * @return imageview
-     */
-    private static ImageView getImageView(int height, int width, String image){
-        ImageView imageView = new ImageView();
-        imageView.setFitHeight(height);
-        imageView.setFitWidth(width);
-        imageView.setImage(ResourceManager.getResourceImage(image));
-        return imageView;
-    }
 }

@@ -1,0 +1,4 @@
+.list-view {
+    -fx-selection-bar: #0096C9;
+    -fx-selection-bar-non-focused: #0096C9;
+}

@@ -22,11 +22,12 @@
 /* set hyperlink styles */
 .hyperlink {
     -fx-font-style: italic;
+    -fx-font-weight: bold;
     -fx-text-fill: blue;
     -fx-border-style: none;
-    -fx-underline: false;
+    -fx-underline: true;
     -fx-border-color: transparent;
-    -fx-padding: 4 0 4 0;
+    -fx-padding: -4 0 -4 0;
 }
 
 .hyperlink:hover {

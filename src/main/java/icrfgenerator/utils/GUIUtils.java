@@ -123,4 +123,20 @@ public class GUIUtils {
         borderPane.setTop(new Label(message));
         return borderPane;
     }
+
+
+    /**
+     * helper for creating an imageview
+     * @param height heigth
+     * @param width width
+     * @param image string name of the image
+     * @return imageview
+     */
+    public static ImageView getImageView(int height, int width, String image){
+        ImageView imageView = new ImageView();
+        imageView.setFitHeight(height);
+        imageView.setFitWidth(width);
+        imageView.setImage(ResourceManager.getResourceImage(image));
+        return imageView;
+    }
 }

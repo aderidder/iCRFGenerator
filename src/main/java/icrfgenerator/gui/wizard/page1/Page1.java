@@ -26,13 +26,21 @@ import icrfgenerator.settings.runsettings.RunSettings;
 import icrfgenerator.utils.GUIUtils;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import org.controlsfx.dialog.Wizard;
 import org.controlsfx.dialog.WizardPane;
 
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 public class Page1 extends WizardPane {
@@ -90,10 +98,25 @@ public class Page1 extends WizardPane {
 
             // add an event to it
             addCheckBoxEvent(checkBox);
+//
+            Hyperlink hyperlink = new Hyperlink("i");
+            hyperlink.getStyleClass().add("hyperlink");
+            hyperlink.setOnAction(event -> {
+                try {
+                    Desktop.getDesktop().browse(new URI("https://decor.nictiz.nl/art-decor/decor-project--"+GlobalSettings.getCodebookPrefix(codebook)));
+                } catch (IOException | URISyntaxException e) {
+                    e.printStackTrace();
+                }
+            });
+
+            HBox hBox = new HBox(checkBox, hyperlink);
+            hBox.setAlignment(Pos.BASELINE_LEFT);
+            hBox.setSpacing(3);
             // add the checkbox to the gridpane
-            gridPane.add(checkBox,i%nrCols, i/nrCols);
+            gridPane.add(hBox,i%nrCols, i/nrCols);
         }
     }
+
 
     /**
      * add an event to a checkbox when it is selected / deselected

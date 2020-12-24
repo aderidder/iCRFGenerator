@@ -25,7 +25,7 @@
 
     <groupId>iCRFGenerator</groupId>
     <artifactId>iCRFGenerator</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.2</version>
 
 
     <properties>
@@ -36,6 +36,12 @@
     </properties>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.openjfx/javafx-base -->
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-base</artifactId>
+            <version>${javafx.version}</version>
+        </dependency>
         <!-- https://mvnrepository.com/artifact/org.openjfx/javafx-controls -->
         <dependency>
             <groupId>org.openjfx</groupId>

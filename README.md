@@ -1,5 +1,5 @@
 # The iCRF Generator
-Semantic interoperability of clinical data requires the use of a common vocabulary, such as SNOMED-CT. Unfortunately, mapping data to such a terminology is time-consuming and requires expert knowledge of both the dataset and the terminology. A viable alternative can be the reuse of codebooks - published dataset definitions which, in some cases, have already been mapped to a terminology. We designed the eCRF Generator, a tool which makes it easy to generate interoperable electronic Case Report Forms for (currently) three major EDCs: OpenClinica 3, Castor and REDCap. The tool currently provides access to several codebooks stored online in Art-Decor, such as: 
+Semantic interoperability of clinical data requires the use of a common vocabulary, such as SNOMED-CT. Unfortunately, mapping data to such a terminology is time-consuming and requires expert knowledge of both the dataset and the terminology. A viable alternative can be the reuse of codebooks - published dataset definitions which, in some cases, have already been mapped to a terminology. We designed the iCRF Generator, a tool which makes it easy to generate interoperable electronic Case Report Forms for (currently) three major EDCs: OpenClinica 3, Castor and REDCap. The tool currently provides access to several codebooks stored online in Art-Decor, such as: 
 * The Basic Health Data Set (Basisgegevensset Zorg), which is the national standard hospitals will use to exchange electronic healthcare record data
 * RIVM’s population screening colorectal cancer and cervical cancer
 * The pathology Colon biopsy and Colonrectum carcinoma protocols from PALGA, the Dutch national pathology registry. 
@@ -14,7 +14,9 @@ The 1.2 release includes the following changes:
 * Support for EMX model output, allowing you to use the iCRF Generator for e.g. Molgenis Catalogue
 * Updated the codelist selection panel, which had some performance issues
 * Added new codebooks, such as the 2020 ZIBs
-* Increased the number of seconds before a timeout occurs. Issue here is that the current version of the FAIRGenomes codebook is just very big, taking ART-DECOR about 1.5 minutes to generate. After the first time it will of course be cached locally.  
+* Added a customisable timeout in the Settings. Default is 2 minutes, but there may still be a timeout, as ART-DECOR can be very slow (they're working on it...). After the first time it will of course be cached locally.  
+* Added a small hyperlink "i" next to all the codebooks on page 1, which links to the codebook's ART-DECOR page
+
 
 ## Supported EDCs
 Currently the program can create a core file for:
@@ -29,12 +31,11 @@ At this moment the following ART-DECOR codebooks are available:
 1.	The Clinical Building Blocks (Zorginformatiebouwstenen), which are information models of minimal clinical concepts
 2.	The Basic Health Data Set (Basisgegevensset Zorg). This codebook is used for the standardised exchange of patient data between e.g. healthcare providers  
 3.	The National Institute for Public Health and the Environment’s national screening codebook of bowel cancer and cervical cancer (RIVM bevolkingsonderzoeken) 
-4.	Cancer Core Europe 
-5.	The PALGA Colon biopsy protocol
-6.	The PALGA Colorectum carcinoma protocol
-7.  The VASCA codebook. A codebook for rare diseases registries based on the JRC common data elements set and the EJPRD semantic model applied to the Registry of Vascular Anomalies (VASCA) use case.
-8.  **NEW: FAIRGenomes codebook**
-9.  **NEW: The Clinical Building Blocks 2020 release**
+4.	The PALGA Colon biopsy protocol
+5.	The PALGA Colorectum carcinoma protocol
+6.  The VASCA codebook. A codebook for rare diseases registries based on the JRC common data elements set and the EJPRD semantic model applied to the Registry of Vascular Anomalies (VASCA) use case.
+7.  **NEW: FAIRGenomes codebook**
+8.  **NEW: The Clinical Building Blocks 2020 release**
 
 ### Custom Codebooks
 If you wish to use the iCRF Generator for ART-DECOR codebooks that are not currently available in the standard set of available codebooks, please do the following:
