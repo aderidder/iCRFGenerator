@@ -98,9 +98,9 @@ public class Page1 extends WizardPane {
 
             // add an event to it
             addCheckBoxEvent(checkBox);
-//
+
             Hyperlink hyperlink = new Hyperlink("i");
-            hyperlink.getStyleClass().add("hyperlink");
+            hyperlink.setStyle("-fx-padding: -4 0 -4 0");
             hyperlink.setOnAction(event -> {
                 try {
                     Desktop.getDesktop().browse(new URI("https://decor.nictiz.nl/art-decor/decor-project--"+GlobalSettings.getCodebookPrefix(codebook)));

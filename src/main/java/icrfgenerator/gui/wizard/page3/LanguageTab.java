@@ -143,7 +143,6 @@ class LanguageTab extends Tab{
 
         // add the second row - the hyperlinks
         Label label = new Label("/");
-        label.setStyle("-fx-padding: 4 0 4 0");
         HBox treeLinkBox = new HBox(expandTreeLink, label, collapseTreeLink);
         treeLinkBox.setSpacing(3);
         gridPane.add(treeLinkBox, 0,1);

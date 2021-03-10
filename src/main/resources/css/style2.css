@@ -23,11 +23,11 @@
 .hyperlink {
     -fx-font-style: italic;
     -fx-font-weight: bold;
-    -fx-text-fill: blue;
+    -fx-text-fill: green;
     -fx-border-style: none;
     -fx-underline: true;
     -fx-border-color: transparent;
-    -fx-padding: -4 0 -4 0;
+    -fx-padding: 0 0 0 0;
 }
 
 .hyperlink:hover {

@@ -133,8 +133,8 @@ public class MainWindow {
         // create an imageview for RIB image
         ImageView ribImv = new ImageView();
         ribImv.setFitHeight(90);
-        ribImv.setFitWidth(162);
-        ribImv.setImage(ResourceManager.getResourceImage("rib.png"));
+        ribImv.setFitWidth(90);
+        ribImv.setImage(ResourceManager.getResourceImage("rib_new.png"));
 
         HBox rightHBox = new HBox();
         rightHBox.setPadding(new Insets(0,10,0,0));
