@@ -9,7 +9,15 @@ By using the definitions from such codebooks, a user ensures interoperability wi
 ***Learn more about the iCRF Generator in the [publication](https://f1000research.com/articles/9-81). If you use the iCRF Generator for your project, please cite the paper!*** 
 
 ## News
-The 1.2 release includes the following changes:
+New in 1.2.4 / 1.2.5:
+* Log4j updated to newest version for security reasons
+
+New in 1.2.3:
+* Updated to new Apache POI library to fix an issue an OpenClinica CRF and EMX model refused to show the save dialog
+* New RIB logo
+* Cosmetic change to the hyperlink layout on page 3 of the wizard
+
+New in 1.2:
 * **Fix for the Mac Catalina gatekeeper issue** See the Running the program chapter below for updated Mac instructions. Let us know if it doesn't work!
 * Support for EMX model output, allowing you to use the iCRF Generator for e.g. Molgenis Catalogue
 * Updated the codelist selection panel, which had some performance issues
