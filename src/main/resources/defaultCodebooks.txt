@@ -14,15 +14,15 @@
 # name<tab>prefix<tab>server<tab>group_is_item<tab>skip_language
 #
 # example:
-# Basisgegevenssset Zorg 2017	bgz2017-	http://decor.nictiz.nl/services/	false
+# Basisgegevenssset Zorg 2017	bgz2017-	https://decor.nictiz.nl/services/	false
 #
-Basisgegevenssset Zorg 2017		bgz2017-	http://decor.nictiz.nl/services/	false
-CBS doodsoorzakenstatistiek		cbs-dstat-		http://decor.nictiz.nl/services/		false
-FAIRGenomes		fairgenomes-		http://decor.nictiz.nl/services/		false
-Labuitwisseling			lu-		http://decor.nictiz.nl/services/	false
-PALGA Colonbiopt Protocol		ppcolbio-	http://decor.nictiz.nl/services/	false
-PALGA Colonrectum Carcinoom Protocol	ppcolcar-	http://decor.nictiz.nl/services/	false
-RIVM bevolkingsonderzoeken		rivmsp-		http://decor.nictiz.nl/services/	false	en-US
-VASCA					vasca-		http://decor.nictiz.nl/services/	false
-Zorginformatiebouwstenen 2017		zib2017bbr-	http://decor.nictiz.nl/services/	false
-Zorginformatiebouwstenen 2020		zib2020bbr-	http://decor.nictiz.nl/services/	false
+Basisgegevenssset Zorg 2017		bgz2017-	https://decor.nictiz.nl/services/	false
+CBS doodsoorzakenstatistiek		cbs-dstat-		https://decor.nictiz.nl/services/		false
+FAIRGenomes		fairgenomes-		https://decor.nictiz.nl/services/		false
+Labuitwisseling			lu-		https://decor.nictiz.nl/services/	false
+PALGA Colonbiopt Protocol		ppcolbio-	https://decor.nictiz.nl/services/	false
+PALGA Colonrectum Carcinoom Protocol	ppcolcar-	https://decor.nictiz.nl/services/	false
+RIVM bevolkingsonderzoeken		rivmsp-		https://decor.nictiz.nl/services/	false	en-US
+VASCA					vasca-		https://decor.nictiz.nl/services/	false
+Zorginformatiebouwstenen 2017		zib2017bbr-	https://decor.nictiz.nl/services/	false
+Zorginformatiebouwstenen 2020		zib2020bbr-	https://decor.nictiz.nl/services/	false

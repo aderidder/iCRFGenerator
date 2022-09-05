@@ -6,9 +6,18 @@ Semantic interoperability of clinical data requires the use of a common vocabula
 
 By using the definitions from such codebooks, a user ensures interoperability with all datasets using these definitions, thus increasing the FAIRness of the data. 
 
-***Learn more about the iCRF Generator in the [publication](https://f1000research.com/articles/9-81). If you use the iCRF Generator for your project, please cite the paper!*** 
+**We've received funding from the NWO (Open Science Fund) to further develop the iCRF Generator!**<br>
+The following will be added in future updates:
+* Support for OpenEHR - Specifically, codebooks from ckm.openehr.org will be made available for reuse
+* Support for ODM-XML
+* Improvements to the User Interface
+
+***Learn more about the iCRF Generator in the [publication](https://f1000research.com/articles/9-81). If you use the iCRF Generator for your project, please cite the paper!***
 
 ## News
+New in 1.2.6:
+* ART-DECOR made some changes which breaks the download of codebooks; instead of http, https has to be used. The file containing the default codebooks is updated with this change. If you don't feel like grabbing the new distribution, you can also just update the codebooks.txt file in the cache directory - change any http to https and you should be fine. 
+
 New in 1.2.4 / 1.2.5:
 * Log4j updated to newest version for security reasons
 
@@ -93,7 +102,7 @@ TODO: find out whether it is possible to change this, especially the JavaFX bit.
 Find our plans for future improvements [here](docs/roadmap.md)! 
 
 ## About
-The iCRF Generator was designed and created by **Sander de Ridder** (VUmc 2019) and Jeroen Beliën (VUmc).\
+The iCRF Generator was designed and created by **Sander de Ridder** (VUmc 2019) and **Jeroen Beliën** (VUmc).\
 Testers & Consultants: 
 * Gerben Rienk Visser (Trial Data Solutions)
 * REDCap testing - Wessel Sloof (UMCG)
@@ -107,6 +116,6 @@ iCRFGenerator is distributed in the hope that it will be useful, but WITHOUT ANY
 
 
 <div style="text-align:center">
-<img src="docs/images/rib.png" height="100">&nbsp;<img src="docs/images/healthri_white.png" height="100">&nbsp;<img src="docs/images/kwf_white.png" height="100">&nbsp;<img src="docs/images/vumc_white.png" height="100"><br>
+<img src="docs/images/NWO.jpg" height="100"> <img src="docs/images/rib_new.png" height="100">&nbsp;<img src="docs/images/healthri_white.png" height="100">&nbsp;<img src="docs/images/kwf_white.png" height="100"><br>
 <img src="docs/images/aumc_white.png" height="60">
 </div>
