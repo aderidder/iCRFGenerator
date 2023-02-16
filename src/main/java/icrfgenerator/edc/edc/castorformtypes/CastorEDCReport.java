@@ -19,7 +19,7 @@ public class CastorEDCReport extends CastorEDC {
         stringBuilder.
                 append("<reports name=\"Reports\" guid=\"reports\">").
                 append("<report>").
-                append("<r_" + phaseId + " name=\"GeneratedReport\" guid=\"" + phaseId + "\" desc=\"Generated Report\" type=\"other\" stepCount=\"1\">").
+                append("<r_" + phaseId + " name=\"GeneratedReport\" guid=\"" + phaseId + "\" desc=\"Generated Report\" type=\"repeated_measure\" stepCount=\"1\">").
                 append("<report_steps>").
                 append("<rs_" + stepId + " name=\"GeneratedStep\" guid=\"" + stepId + "\" desc=\"Generated Step\" report_step_number=\"1\">");
     }

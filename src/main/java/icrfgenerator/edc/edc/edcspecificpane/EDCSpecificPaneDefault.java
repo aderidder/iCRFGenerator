@@ -20,6 +20,7 @@
 package icrfgenerator.edc.edc.edcspecificpane;
 
 import icrfgenerator.codebook.CodebookItem;
+import icrfgenerator.types.NodeType;
 import icrfgenerator.edc.edc.edcspecificpane.edccodelistpane.CodelistPane;
 import icrfgenerator.gui.i18n.I18N;
 import icrfgenerator.settings.runsettings.RunSettings;
@@ -27,20 +28,19 @@ import icrfgenerator.utils.GUIUtils;
 import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
 import javafx.scene.control.Separator;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
 
 /**
  *
  * Default implementation of the EDCSpecificPane
- * All EDCs are expected to extend this class
+ * All EDCs are expected to extend this or the EDCSpecificPaneDefaultStandardFields class
  */
 abstract class EDCSpecificPaneDefault implements EDCSpecificPane {
     private static final Logger logger = LogManager.getLogger(EDCSpecificPaneDefault.class.getName());
@@ -60,39 +60,78 @@ abstract class EDCSpecificPaneDefault implements EDCSpecificPane {
     }
 
     /**
-     * A user clicks on the checkbox of an item in a different tree item thereby selecting the item
-     * This implies:
-     * 1. highlight the item
-     *  a. build the Pane
-     * 2. select the item
-     *  a. stores the values
-     *  b. enable the items
+     * If the item is a group item, set the borderpane to show a message
      * @param key codebook + datasetId + language
      * @param codebookItem item for which to build the pane
      */
     @Override
-    public final void highlightingSelecting(String key, CodebookItem codebookItem){
-        logger.log(Level.DEBUG, "Highlighting and selecting an item");
+    public void showInfoGroup(String key, CodebookItem codebookItem){
+        borderPane.setTop(null);
+        if(codebookItem.getItemDescription().equalsIgnoreCase("")){
+            borderPane.setCenter(new Label("Select a leaf node to set an item's properties"));
+        }
+        else {
+            borderPane.setCenter(new Label(codebookItem.getItemDescription()));
+        }
+    }
+
+    /**
+     * If the item is an info leaf (no real content), set the borderpane to show a message
+     * @param key codebook + datasetId + language
+     * @param codebookItem item for which to build the pane
+     */
+    @Override
+    public void showInfoLeaf(String key, CodebookItem codebookItem){
+        borderPane.setTop(null);
+        borderPane.setCenter(new Label(codebookItem.getItemDescription()));
+    }
+
+    /**
+     * Show the item with either enabled fields and values or disabled fields
+     * @param key codebook + datasetId + language
+     * @param codebookItem item for which to build the pane
+     */
+    @Override
+    public void showItem(String key, CodebookItem codebookItem){
         buildPane(key, codebookItem);
-        storeAllValues();
+        if(RunSettings.getInstance().itemIsSelected(key, codebookItem.getId())){
+            loadStoredValuesEDC();
+            enableFields();
+        }
+        else{
+            disableFields();
+        }
+    }
+
+    /**
+     * Select the item
+     * @param key codebook + datasetId + language
+     * @param codebookItem item selected
+     */
+    @Override
+    public void singleSelectItem(String key, CodebookItem codebookItem){
+        RunSettings runSettings = RunSettings.getInstance();
+        buildPane(key, codebookItem);
+        // if item already stored, load its stored values
+        if(runSettings.itemIsSelected(key, codebookItem.getId())) {
+            loadStoredValuesEDC();
+        }
+        // else add it as selected, select/store all codelist items and store all other values
+        else{
+            runSettings.addSelectedItem(key, itemId);
+            selectAllCodeListItems();
+            storeAllValuesEDC();
+        }
         enableFields();
     }
 
-    @Override
     /**
-     * A user clicks on the checkbox of an item in a different tree item thereby deselecting the item
-     * This implies:
-     * 1. highlight the item
-     *  a. build the Pane
-     *  b. load the stored values
-     * 2. deselect the item (stores the values)
-     *  a. remove stored values
-     *  b. disable the items
+     * deselect a single item
      * @param key codebook + datasetId + language
-     * @param codebookItem item for which to build the pane
+     * @param codebookItem item deselected
      */
-    public final void highlightingDeselecting(String key, CodebookItem codebookItem){
-        logger.log(Level.DEBUG, "Highlighting and deselecting an item");
+    @Override
+    public void singleDeselectItem(String key, CodebookItem codebookItem){
         buildPane(key, codebookItem);
         loadStoredValuesEDC();
         removeStoredValues();
@@ -100,69 +139,37 @@ abstract class EDCSpecificPaneDefault implements EDCSpecificPane {
     }
 
     /**
-     * A user highlights an item that was previously selected
-     * This implies:
-     * 1. highlight the item
-     *  a. build the Pane
-     *  b. load the stored values
-     *  c. enable the items
+     * select an item due to a group-select
      * @param key codebook + datasetId + language
-     * @param codebookItem item for which to build the pane
+     * @param codebookItem item selected
      */
     @Override
-    public final void highlightingSelected(String key, CodebookItem codebookItem){
-        logger.log(Level.DEBUG, "Highlighting a selected item");
-        buildPane(key, codebookItem);
-        loadStoredValuesEDC();
-        enableFields();
+    public void groupSelectItem(String key, CodebookItem codebookItem){
+        RunSettings runSettings = RunSettings.getInstance();
+        storeRefs(key, codebookItem);
+
+        if(!runSettings.itemIsSelected(key, itemId) && codebookItem.getNodeType().equals(NodeType.LEAFITEM)) {
+            runSettings.addSelectedItem(key, itemId);
+            storeAllValuesEDCGroupSelect();
+            if(codebookItem.hasCodeList()){
+                CodelistPane.codelistGroupSelect(key, codebookItem);
+            }
+        }
     }
 
     /**
-     * A user highlights an item that was previously not selected
-     * This implies:
-     * 1. highlight the item
-     *  a. build the Pane
-     *  b. disable the items
+     * deselect an item due to a group-select
      * @param key codebook + datasetId + language
-     * @param codebookItem item for which to build the pane
+     * @param codebookItem item deselected
      */
     @Override
-    public final void highlightingDeselected(String key, CodebookItem codebookItem){
-        logger.log(Level.DEBUG, "Highlighting a deselected item");
-        buildPane(key, codebookItem);
-        disableFields();
-    }
+    public void groupDeselectItem(String key, CodebookItem codebookItem){
+        this.key = key;
+        this.itemId = codebookItem.getId();
 
-    /**
-     * A user clicks on the checkbox of an already highlighted item, selecting the item
-     * This implies:
-     * 1. select the item
-     *  a. store the values
-     *  b. enable the items
-     * @param key codebook + datasetId + language
-     * @param codebookItem item for which to build the pane
-     */
-    @Override
-    public final void highlightedSelecting(String key, CodebookItem codebookItem){
-        logger.log(Level.DEBUG, "Already highlighted and select");
-        storeAllValues();
-        enableFields();
-    }
-
-    /**
-     * A user clicks on the checkbox of an already highlighted item, deselecting the item
-     * This implies:
-     * 1. select the item
-     *  a. remove the stored values
-     *  b. disable the items
-     * @param key codebook + datasetId + language
-     * @param codebookItem item for which to build the pane
-     */
-    @Override
-    public final void highlightedDeselecting(String key, CodebookItem codebookItem){
-        logger.log(Level.DEBUG, "Already highlighted and deselect");
-        removeStoredValues();
-        disableFields();
+        if(RunSettings.getInstance().itemIsSelected(key, itemId)) {
+            removeStoredValues();
+        }
     }
 
     /**
@@ -174,13 +181,16 @@ abstract class EDCSpecificPaneDefault implements EDCSpecificPane {
         return borderPane;
     }
 
+
     /**
-     * called when the user highlights a non-leaf node
+     * store some stuff used throughout
+     * @param key codebook + datasetId + language
+     * @param codebookItem codebookItem
      */
-    @Override
-    public final void setInfoPane(){
-        borderPane.setTop(null);
-        borderPane.setCenter(new Label("Select a leaf node to set an item's properties"));
+    private void storeRefs(String key, CodebookItem codebookItem){
+        this.codebookItem = codebookItem;
+        this.itemId = codebookItem.getId();
+        this.key = key;
     }
 
     /**
@@ -189,9 +199,7 @@ abstract class EDCSpecificPaneDefault implements EDCSpecificPane {
      * @param codebookItem item for which to build the pane
      */
     private void buildPane(String key, CodebookItem codebookItem){
-        this.codebookItem = codebookItem;
-        this.itemId = codebookItem.getId();
-        this.key = key;
+        storeRefs(key, codebookItem);
 
         setupTopPane();
         setupCenterPane();
@@ -218,17 +226,17 @@ abstract class EDCSpecificPaneDefault implements EDCSpecificPane {
         gridPane.add(itemLabel,0,rowNum,colSpan,1);
 
         // create a label with the description of the item
-        Label descriptionLabel = GUIUtils.createWrappedLabel(I18N.getLanguageText("edcDescription")+" "+codebookItem.getDescription(), prefWidth);
+        Label descriptionLabel = GUIUtils.createWrappedLabel(I18N.getLanguageText("edcDescription")+" "+codebookItem.getItemDescription(), prefWidth);
         gridPane.add(descriptionLabel,0,++rowNum,colSpan,1);
 
         rowNum++;
 
         // create a label with the codesystem's name and the code of the item in this codesystem
-        Label codeSystemLabel = new Label(I18N.getLanguageText("edcOntology")+" "+codebookItem.getCodeSystem() +" - "+codebookItem.getCode());
+        Label codeSystemLabel = new Label(I18N.getLanguageText("edcOntology")+" "+codebookItem.getCodeSystemForItem() +" - "+codebookItem.getCodeForItem());
         gridPane.add(codeSystemLabel,0,++rowNum,colSpan,1);
 
         // create a label with de description of the code in the codesystem
-        Label codeDescriptionLabel = GUIUtils.createWrappedLabel(I18N.getLanguageText("edcCodeDescription")+" "+codebookItem.getCodeDescription(), prefWidth);
+        Label codeDescriptionLabel = GUIUtils.createWrappedLabel(I18N.getLanguageText("edcCodeDescription")+" "+codebookItem.getItemCodeDescription(), prefWidth);
         gridPane.add(codeDescriptionLabel,0,++rowNum,colSpan,1);
 
         // add a separator for visual purposes
@@ -246,22 +254,14 @@ abstract class EDCSpecificPaneDefault implements EDCSpecificPane {
     }
 
     /**
-     * store all the values for the item
-     */
-    private void storeAllValues(){
-        RunSettings.getInstance().addSelectedItem(key, itemId);
-        selectAllCodeListItems();
-        storeAllValuesEDC();
-    }
-
-    /**
      * remove the values for the item
      */
     private void removeStoredValues(){
-        deselectAllCodeListItems();
+        if(codebookItem.hasCodeList()) {
+            deselectAllCodeListItems();
+        }
         RunSettings.getInstance().removeSelectedItem(key, itemId);
     }
-
 
     /**
      * general disable fields
@@ -279,9 +279,9 @@ abstract class EDCSpecificPaneDefault implements EDCSpecificPane {
         if(codebookItem.hasCodeList()){
             buttonSelectAll.setDisable(false);
             buttonSelectNone.setDisable(false);
+            codelistPane.enableFields();
         }
         enableFieldsEDC();
-        codelistPane.enableFields();
     }
 
     /**
@@ -302,14 +302,8 @@ abstract class EDCSpecificPaneDefault implements EDCSpecificPane {
      * setup the center pane, which contains the codelist pane
      */
     private void setupCenterPane(){
-        codelistPane = new CodelistPane(key, codebookItem);
-//        ScrollPane scrollPane = new ScrollPane(codelistPane);
-//        scrollPane.setPadding(new Insets(5,0,15,0));
-//        borderPane.setCenter(codelistPane.getView());
+        codelistPane = CodelistPane.getCodelistPane(key, codebookItem);
         borderPane.setCenter(codelistPane);
-
-//        codelistPane = new CodelistPane(key, codebookItem, borderPane);
-
     }
 
     /**
@@ -335,6 +329,7 @@ abstract class EDCSpecificPaneDefault implements EDCSpecificPane {
         borderPane.setBottom(hBox);
     }
 
+
     /**
      * load the values that are currently stored
      */
@@ -354,6 +349,11 @@ abstract class EDCSpecificPaneDefault implements EDCSpecificPane {
      * store all the values
      */
     abstract void storeAllValuesEDC();
+
+    /**
+     * store all values due to a group-select
+     */
+    abstract void storeAllValuesEDCGroupSelect();
 
     /**
      * create the top pane which contains EDC-specific fields

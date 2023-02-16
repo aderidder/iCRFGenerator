@@ -20,7 +20,11 @@
 
 package icrfgenerator.utils;
 
+/**
+ * helper functions for strings
+ */
 public class StringUtils {
+
     /**
      * removes all spaces from a string
      * @param string string
@@ -29,7 +33,6 @@ public class StringUtils {
     public static String removeSpacesFromString(String string){
         return string.replaceAll(" ","_");
     }
-
 
     /**
      * escapes comma in string
@@ -49,6 +52,11 @@ public class StringUtils {
         return "\""+string+"\"";
     }
 
+    /**
+     * transform some values which are not compatible with XML
+     * @param value string to search for incompatible values
+     * @return string with these incompatible values replaced
+     */
     public static String prepareValueForXML(String value){
         value = value.replaceAll("&", "&amp;");
         value = value.replaceAll("<", "&lt;");
@@ -59,5 +67,17 @@ public class StringUtils {
         value = value.replaceAll("≤", "&lt;=");
         return value.trim();
     }
+
+    /**
+     * @param value value from which to remove the dot
+     * @return cleaned value
+     */
+    public static String removeDot(String value){
+        if(value.contains(".")){
+            return value.substring(0, value.lastIndexOf("."));
+        }
+        return value;
+    }
+
 
 }

@@ -43,13 +43,13 @@ class AboutWindow extends Dialog{
     private static final double prefWidth = 675;
     private static final double prefHeight = 400;
 
-    private AboutWindow(){
-        createDialog();
-    }
-
     static void showAbout(){
         Dialog aboutWindow = new AboutWindow();
         aboutWindow.showAndWait();
+    }
+
+    private AboutWindow(){
+        createDialog();
     }
 
     /**
@@ -145,12 +145,17 @@ class AboutWindow extends Dialog{
         ImageView aumcImv = GUIUtils.getImageView(height,5*width,"aumc_white.png");
         grid.add(aumcImv,2,1,5,1);
 
-        ImageView bbmriImv = GUIUtils.getImageView(height,2*width,"bbmri_white.png");
-        grid.add(bbmriImv,6,1,2,1);
+//        ImageView bbmriImv = GUIUtils.getImageView(height,2*width,"bbmri_white.png");
+        ImageView bbmriImv = GUIUtils.getImageView(2*height,width,"nwo.png");
+        grid.add(bbmriImv,6,1,2,2);
 
         // third row
+        ImageView amcImv = GUIUtils.getImageView(height,2*width,"amc_white.png");
+        grid.add(amcImv,0,2,2,1);
+
         ImageView healthriImv = GUIUtils.getImageView(height,3*width,"healthri_white_small.png");
-        grid.add(healthriImv,0,2,3,1);
+        grid.add(healthriImv,2,2,3,1);
+
 
         // give the grid an id and add styleclass
         grid.setId("icons");

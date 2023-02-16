@@ -25,19 +25,10 @@ import icrfgenerator.settings.runsettings.ItemDetails;
  * OpenClinica 3 specific item details
  */
 class OpenClinica3ItemDetails extends ItemDetails {
-    private String dataType;
     private String fieldType;
 
     OpenClinica3ItemDetails(String key, String itemId){
         super(key, itemId);
-    }
-
-    /**
-     * update the data type
-     * @param dataType the new data type
-     */
-    void setItemDataType(String dataType){
-        this.dataType = dataType;
     }
 
     /**
@@ -46,14 +37,6 @@ class OpenClinica3ItemDetails extends ItemDetails {
      */
     void setItemFieldType(String fieldType){
         this.fieldType = fieldType;
-    }
-
-    /**
-     * returns the item's data type
-     * @return the item's data type
-     */
-    String getDataType(){
-        return dataType;
     }
 
     /**

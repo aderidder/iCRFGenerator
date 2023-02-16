@@ -49,37 +49,20 @@ public class EMXDefinition {
 
     /**
      * converts the art-decor datatype to a castor datatype if possible; otherwise returns string
-     * https://art-decor.org/mediawiki/index.php?title=DECOR-dataset
+     * <a href="https://art-decor.org/mediawiki/index.php?title=DECOR-dataset">...</a>
      * @param dataType art-decor datatype
      * @return converted datatype or string
      */
     public static String convertDataTypeToEDCFieldType(String dataType){
-        String converted;
-        switch (dataType){
-            case "code":
-                converted = "categorical";
-                break;
-            case "decimal":
-                converted = "decimal";
-                break;
-            case "integer":
-            case "count":
-            case "quantity":
-            case "duration":
-                converted = "int";
-                break;
-            case "boolean":
-                converted = "bool";
-                break;
-            case "date":
-                converted = "date";
-                break;
-            case "string":
-            case "identifier": //could be INT, but assume it's ST
-             default:
-                converted = "string";
-        }
-        return converted;
+        return switch (dataType) {
+            case "code" -> "categorical";
+            case "decimal" -> "decimal";
+            case "integer", "count", "quantity", "duration" -> "int";
+            case "boolean" -> "bool";
+            case "date" -> "date";
+            case "string", "identifier", "datetime" -> "string";
+            default -> "string";
+        };
     }
 
 }

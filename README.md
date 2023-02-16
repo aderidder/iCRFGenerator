@@ -1,20 +1,30 @@
 # The iCRF Generator
-Semantic interoperability of clinical data requires the use of a common vocabulary, such as SNOMED-CT. Unfortunately, mapping data to such a terminology is time-consuming and requires expert knowledge of both the dataset and the terminology. A viable alternative can be the reuse of codebooks - published dataset definitions which, in some cases, have already been mapped to a terminology. We designed the iCRF Generator, a tool which makes it easy to generate interoperable electronic Case Report Forms for (currently) three major EDCs: OpenClinica 3, Castor and REDCap. The tool currently provides access to several codebooks stored online in Art-Decor, such as: 
+
+**The NWO-Funded Extended iCRF Generator (version 2.0) has just been released! See the News section for all the changes!**<br>
+
+Semantic interoperability of clinical data requires the use of a common vocabulary, such as SNOMED-CT. Unfortunately, mapping data to such a terminology is time-consuming and requires expert knowledge of both the dataset and the terminology. A viable alternative can be the reuse of codebooks - published dataset definitions which, in some cases, have already been mapped to a terminology. We designed the iCRF Generator, a tool which makes it easy to generate interoperable Case Report Forms (iCRFs) for several major EDCs, including Castor and REDCap. The tool currently provides access to multiple codebooks stored online in ART-DECOR and OpenEHR, such as: 
 * The Basic Health Data Set (Basisgegevensset Zorg), which is the national standard hospitals will use to exchange electronic healthcare record data
 * RIVM’s population screening colorectal cancer and cervical cancer
 * The pathology Colon biopsy and Colonrectum carcinoma protocols from PALGA, the Dutch national pathology registry. 
 
 By using the definitions from such codebooks, a user ensures interoperability with all datasets using these definitions, thus increasing the FAIRness of the data. 
 
-**We've received funding from the NWO (Open Science Fund) to further develop the iCRF Generator!**<br>
-The following will be added in future updates:
-* Support for OpenEHR - Specifically, codebooks from ckm.openehr.org will be made available for reuse
-* Support for ODM-XML
-* Improvements to the User Interface
-
 ***Learn more about the iCRF Generator in the [publication](https://f1000research.com/articles/9-81). If you use the iCRF Generator for your project, please cite the paper!***
 
 ## News
+New in 2.0 - This is major release and includes many new features:
+* Support for OpenEHR - Specifically, we've added codebooks from ckm.openehr.org
+* Support for CDISC's ODM-XML
+* Improvements to the User Interface:
+  * Change in the iCRF Generator's flow. In the original version, when you selected languages, you were given the codebooks in these languages. In the new version, you select a main language and alternative languages. You are presented the codebook in the main language and the CRFs are also generated in the alternative languages using these same items.
+  * Improved selection of codebooks. You can now search for codebooks based on multiple search parameters
+* Easier to customise some aspects (see the Customising the iCRF Generator section):
+  * Originally, the iCRF Generator had a codebooks.txt where you could add codebooks. This has been moved to an Excel file, iCRFSettings.xlsx
+  * Additionally, this file contains languages and validation messages for some languages. You may want to add validation messages for your particular language here, since it currently contains only Dutch and English.
+    * Note: these messages are currently used by ODM-XML and Castor. We aim to add them to other EDCs as well when appropriate.
+* Updated the OpenClinica 3 functionality, which was outdated compared to the other EDCs.
+* Added LibreClinica to the list of EDCs - this uses the OpenClinica 3 functionality.
+
 New in 1.2.6:
 * ART-DECOR made some changes which breaks the download of codebooks; instead of http, https has to be used. The file containing the default codebooks is updated with this change. If you don't feel like grabbing the new distribution, you can also just update the codebooks.txt file in the cache directory - change any http to https and you should be fine. 
 
@@ -35,41 +45,43 @@ New in 1.2:
 * Added a small hyperlink "i" next to all the codebooks on page 1, which links to the codebook's ART-DECOR page
 
 
-## Supported EDCs
-Currently the program can create a core file for:
+## Supported Outputs
+Currently the program can create a file for:
 * Castor EDC: creates an XML file which you can import in Castor, after which you can manually tweak it
-* OpenClinica 3: creates an OpenClinica 3 Excel template with the items selected in it. The user can add additional details to the Excel and upload it to OpenClinica 3 afterwards
+* OpenClinica 3 / LibreClinica: creates an Excel template with the items selected in it. The user can add additional details to the Excel and upload it to OpenClinica 3 afterwards
 * REDCap: creates a csv file, which can be further edited and uploaded to REDCap
+* Molgenis EMX: generated files are compatible. Molgenis team are creating a 2.0 version of their model, which is not included here yet.
+* ODM-XML: generated files validate. Depending on where you want to use the file, specific ODM-extensions may be necessary
   
 Additional EDCs may be added at some point if there is sufficient demand and I know the import definitions (Alea, OC4, Research Manager, etc).
 
 ## Available Codebooks
-At this moment the following ART-DECOR codebooks are available:
-1.	The Clinical Building Blocks (Zorginformatiebouwstenen), which are information models of minimal clinical concepts
-2.	The Basic Health Data Set (Basisgegevensset Zorg). This codebook is used for the standardised exchange of patient data between e.g. healthcare providers  
-3.	The National Institute for Public Health and the Environment’s national screening codebook of bowel cancer and cervical cancer (RIVM bevolkingsonderzoeken) 
-4.	The PALGA Colon biopsy protocol
-5.	The PALGA Colorectum carcinoma protocol
-6.  The VASCA codebook. A codebook for rare diseases registries based on the JRC common data elements set and the EJPRD semantic model applied to the Registry of Vascular Anomalies (VASCA) use case.
-7.  **NEW: FAIRGenomes codebook**
-8.  **NEW: The Clinical Building Blocks 2020 release**
+At this moment the following codebooks are immediately available:
+1. ART-DECOR: The Clinical Building Blocks (Zorginformatiebouwstenen), which are information models of minimal clinical concepts
+2. ART-DECOR: The Basic Health Data Set (Basisgegevensset Zorg). This codebook is used for the standardised exchange of patient data between e.g. healthcare providers  
+3. ART-DECOR: The National Institute for Public Health and the Environment’s national screening codebook of bowel cancer and cervical cancer (RIVM bevolkingsonderzoeken) 
+4. ART-DECOR: The PALGA Colon biopsy protocol
+5. ART-DECOR: The PALGA Colorectum carcinoma protocol
+6. ART-DECOR: The VASCA codebook. A codebook for rare diseases registries based on the JRC common data elements set and the EJPRD semantic model applied to the Registry of Vascular Anomalies (VASCA) use case.
+7. ART-DECOR: FAIRGenomes codebook
+8. ART-DECOR: The Clinical Building Blocks 2020 release
+9. OpenEHR: Blood Pressure
+10. OpenEHR: Glasgow Coma Scale (GCS)
+11. OpenEHR: Hip arthroplasty component
 
-### Custom Codebooks
-If you wish to use the iCRF Generator for ART-DECOR codebooks that are not currently available in the standard set of available codebooks, please do the following:
-*  Go to the cache directory
-    *  If this directory does not yet exist, start the iCRF Generator and close it again - starting it will create the directory 
-*  Open the file "codebooks.txt" in your favorite editor
-*  Add the codebook following the format described in the codebooks.txt file
-*  Start the iCRF Generator
-*  Page 2, the page that allows you to select codebooks, should now show your newly added codebook
-    * If it does not, ask for help
-    
-Please be aware that I cannot guarantee that iCRF Generator is compatible with every codebook available in ART-DECOR!  
+This may change in the future. Please note that if you want to use a different codebook from ART-DECOR or OpenEHR, you can easily add it to the iCRFSettings.xlsx file (Codebooks tab). See [adding new codebooks](docs/add_codebooks.md)! for more information.
+
+### Customising the iCRF Generator
+The iCRF Generator now comes with a new settings file, called iCRFSettings.xlsx, which is available in the cache directory after the first run. This file contains the following sheets:
+1. Info - explains what the file does and what the other sheets are for
+2. Codebooks - contains the default iCRF Generator codebooks. You can add additional codebooks from OpenEHR or ART-DECOR here. Once you've done so, (re)start the iCRF Generator and the codebooks should be visible in the Codebook Selection page.
+3. ValidationMessages - contains messages for a specific language. These are used when validations are created in that language. When no message in a specific language is available this defaults to English. This functionality is currently used by ODM-XML and Castor.
+4. Languages - maps an extended language to a simple language. E.g. en-US and en-UK are both mapped to en. This is necessary to be able to determine overlapping languages between codebooks. You can alter this if you feel languages should not be considered the same.
 
 ## Running the program
 If you downloaded the distribution ZIP file, it comes provided with its own JRE. The next sections show how to start the application for Windows and Mac.  
-*Please be aware that the first time a codebook is selected, it has to be downloaded from ART-DECOR, which can take a while! The program stores
-the downloaded XML file locally in the cache directory, so subsequent loading of that codebook will be very fast.*
+*Please be aware that the first time a codebook is selected, it has to be downloaded, which can take a while! The program stores
+the downloaded codebooks locally in the cache directory, so subsequent loading of that codebook will be very fast.*
 
 ### Windows
 Unpack the file and double-click on runme.bat
@@ -81,32 +93,22 @@ Unpack the file and ***right-click*** the runme.command file and select ***open*
 Subsequent runs:
 Double-click the runme.command file.
 
-
 ## Some limitations
-* The iCRF Generator aims at generating items, so additional details (such as sections, repeating groups, etc) will have to be added manually.
-* The iCRF Generator currently allows access to six codebooks. We may add support for more codebooks in the future. If you have a great codebook available, which is unique and not overlapping too much with existing codebooks, feel free to contact us and we'll see whether it can be added.
-
-## Creating a distributable zip file with JRE
-JavaFX went from being integrated in Oracle's Java 8 to being a separate package, which is compatible with Java 11 and 12. Whereas in Java 8 it was possible to create a fat-jar which would then run on any computer with a Java 8 JRE, this is no longer an option as there is no JRE for these distributions. So, the fat-jar no longer being an option, the way to go is to generate my own JRE for Java 12 and provide that as part of my distribution. The nice thing is that you only include the modules from Java that are necessary, meaning the size stays manageable and that the windows/mac distribution will run on any windows/mac machine since I'm providing the JRE myself, so no more issues on e.g. a mac that does not have a JRE installed. However, I'm still confused on how to properly handle JavaFX in this modular approach. JavaFX has jmods files and jar files. The jmods I need to be able to generate the JRE; the jar files in my IDE. I use Maven to fetch the jar files, but there does not yet seem to be a mature plugin for jlink. So I ended up with some Maven stuff in which, for a distribution, I:
-* Create a Jar file for GenerateCRF
-* Copy all the dependencies, except the JavaFX jar files to a directory
-* Download the JavaFX jmods and unpack these
-* Generate the JRE, using the jmods
-* Create a zip file from the jar file, the dependencies and the JRE
-
-I created a profile for both Mac and Windows. So basically, if you're on one of these platforms and you call Maven's package, it will create a nice distributable zip file, including a script file which the user can double-click to run the program.
-
-TODO: find out whether it is possible to change this, especially the JavaFX bit.
+* The iCRF Generator aims at generating items, so additional details (such as sections, repeating groups, etc) will have to be added manually. We may add some of this functionality in the future if there's demand for it and funding can be found.
+* The iCRF Generator currently allows access to multiple codebooks out of the box. You can easily add more (ART-DECOR/OPENEHR) codebooks to the iCRFSettings file, although we cannot guarantee they all work
 
 ## Roadmap
 Find our plans for future improvements [here](docs/roadmap.md)! 
 
 ## About
-The iCRF Generator was designed and created by **Sander de Ridder** (VUmc 2019) and **Jeroen Beliën** (VUmc).\
+The iCRF Generator was designed and created by **Sander de Ridder** (Amsterdam UMC) and **Jeroen Beliën** (Amsterdam UMC).\
 Testers & Consultants: 
 * Gerben Rienk Visser (Trial Data Solutions)
 * REDCap testing - Wessel Sloof (UMCG)
-This project was sponsored by KWF project TraIT2Health-RI (WP: Registry-in-a-Box)
+
+This project was sponsored by:
+* NWO Open Science Fund 2021
+* KWF project TraIT2Health-RI - Registry-in-a-Box
 ---
 iCRFGenerator is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 

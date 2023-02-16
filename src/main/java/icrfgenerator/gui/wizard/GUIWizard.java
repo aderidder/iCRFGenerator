@@ -21,10 +21,11 @@ package icrfgenerator.gui.wizard;
 
 import icrfgenerator.edc.edc.edcspecificpane.edccodelistpane.CodelistPane;
 import icrfgenerator.gui.i18n.I18N;
-import icrfgenerator.gui.wizard.page1.Page1;
-import icrfgenerator.gui.wizard.page2.Page2;
-import icrfgenerator.gui.wizard.page3.Page3;
-import icrfgenerator.gui.wizard.page4.Page4;
+import icrfgenerator.gui.wizard.selectcodebooks.SelectCodebooksPage;
+import icrfgenerator.gui.wizard.selectdatasets.SelectDatasetsPage;
+import icrfgenerator.gui.wizard.selectitems.SelectItemsPage;
+import icrfgenerator.gui.wizard.selectlanguages.SelectLanguagesPage;
+import icrfgenerator.gui.wizard.summarypage.SummaryPage;
 import javafx.scene.control.ButtonType;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -53,11 +54,12 @@ public class GUIWizard {
     public boolean showWizard() {
         Wizard wizard = new Wizard();
         // create the pages
-        WizardPane page1 = new Page1(wizardWidth, wizardHeight);
-        WizardPane page2 = new Page2(wizardWidth, wizardHeight);
-        WizardPane page3 = new Page3(wizardWidth+400, wizardHeight+200);
-        WizardPane page4 = new Page4(wizardWidth, wizardHeight);
-        wizard.setFlow(new Wizard.LinearFlow(page1, page2, page3, page4));
+        WizardPane selectCodebooksPage = new SelectCodebooksPage(wizardWidth, wizardHeight);
+        WizardPane selectDatasetsPage = new SelectDatasetsPage(wizardWidth, wizardHeight);
+        WizardPane selectLanguagesPage = new SelectLanguagesPage(wizardWidth, wizardHeight);
+        WizardPane selectItemsPage = new SelectItemsPage(wizardWidth+400, wizardHeight+200);
+        WizardPane summaryPage = new SummaryPage(wizardWidth, wizardHeight);
+        wizard.setFlow(new Wizard.LinearFlow(selectCodebooksPage, selectDatasetsPage, selectLanguagesPage, selectItemsPage, summaryPage));
 
         // show wizard and wait for response
         wizard.showAndWait().ifPresent(result -> {
@@ -76,9 +78,10 @@ public class GUIWizard {
      * reset some static variables on the pages
      */
     public static void resetWizard(){
-        Page1.reset();
-        Page2.reset();
-        Page3.reset();
+        SelectCodebooksPage.reset();
+        SelectDatasetsPage.reset();
+        SelectLanguagesPage.reset();
+        SelectItemsPage.reset();
         CodelistPane.reset();
     }
 }

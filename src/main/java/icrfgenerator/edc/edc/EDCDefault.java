@@ -19,24 +19,67 @@
 
 package icrfgenerator.edc.edc;
 
+import icrfgenerator.settings.runsettings.RunSettings;
+
+import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * default implementation of the EDC interface
  */
 public abstract class EDCDefault implements EDC {
-    private Map<String, Integer> itemNameCounterMap = new HashMap<>();
-    private String edcName;
+    private final Map<String, Integer> itemNameCounterMap = new HashMap<>();
+    private final String edcName;
 
     EDCDefault(String edcName){
         this.edcName = edcName;
     }
 
+    /**
+     * Generate crfs
+     * @param file base filename
+     */
+    @Override
+    public void generateCRFs(File file){
+        RunSettings runSettings = RunSettings.getInstance();
+        List<String> languageList = runSettings.getAllLanguages();
+        for(String language:languageList) {
+            List<String> keys = runSettings.getAllKeysForLanguage(language);
+            setup();
+            generateCRF(keys, language);
+            writeFile(getLanguageFile(file, language));
+        }
+    }
+
+    /**
+     * returns the name of the EDC
+     * @return the name of the EDC
+     */
+    @Override
+    public final String getEDCName(){
+        return edcName;
+    }
+
+    /**
+     * change the base filename to one with a language
+     * e.g. myfile.xlsx --> myfile_en.xlsl
+     * @param file     base file
+     * @param language language to add to the name
+     * @return the new file with the language in the name
+     */
+    private File getLanguageFile(File file, String language){
+        String fileName = file.getPath();
+        String noExtension = fileName.substring(0, fileName.lastIndexOf("."));
+        String extension = fileName.substring(fileName.lastIndexOf("."));
+        return new File(noExtension+"_"+language+extension);
+    }
 
     /**
      * in case where items are inherited, like the zibs, an item name may use its uniqueness
      * this method ensures an item is unique
+     * ToDo: is still an issue with the new approach?
      * @param itemName name of the item which we want to be unique
      * @return either the itemName or the itemName with a trailing number
      */
@@ -54,24 +97,15 @@ public abstract class EDCDefault implements EDC {
 
     /**
      * reset the unique item-name tracker
+     * todo: do we still need this?
      */
     private void resetUnique(){
         itemNameCounterMap.clear();
     }
 
     /**
-     * returns the name of the EDC
-     * @return the name of the EDC
-     */
-    @Override
-    public final String getEDCName(){
-        return edcName;
-    }
-
-    /**
      * setup the EDC
      */
-    @Override
     final public void setup(){
         resetUnique();
         setupEDC();
@@ -81,4 +115,7 @@ public abstract class EDCDefault implements EDC {
      * to be implemented for each EDC to ensure each can do its own local setup
      */
     abstract void setupEDC();
+    abstract void generateCRF(List<String> keys, String language);
+    abstract void writeFile(File file);
+
 }

@@ -29,7 +29,8 @@ public class REDCapDefinition {
     private static final List<String> codeListFieldTypes = Arrays.asList("dropdown", "radio", "checkbox");
     private static final List<String> nonCodeListFieldTypes = Arrays.asList("text", "notes");
 
-    private static final List<String> textValidationOptionsList = Arrays.asList("","integer", "number", "date", "phone", "email");
+//    private static final List<String> textValidationOptionsList = Arrays.asList("","integer", "number", "date", "phone", "email");
+    private static final List<String> textValidationOptionsList = Arrays.asList("","integer", "number", "date");
 
     /**
      * returns a list with the field types that have a codelist
@@ -47,7 +48,6 @@ public class REDCapDefinition {
         return nonCodeListFieldTypes;
     }
 
-
     /**
      * returns a list with the types that can be selected when a user selects "text" as field type
      * the types this method returns can be set as Text Validation
@@ -57,28 +57,15 @@ public class REDCapDefinition {
         return textValidationOptionsList;
     }
 
-
-//    public String convertDataTypeToEDCDataType(String datatype, String codeDataType) {
-//        String converted;
-//        switch (datatype){
-//            case "integer":
-//            case "count":
-//            case "boolean":
-//                converted = "integer";
-//                break;
-//            case "date":
-//                converted = "date";
-//                break;
-//            case "quantity": // could be integer or number
-//            case "code":
-//            case "string":
-//            case "identifier":
-//            case "duration":
-//            default:
-//                converted = "";
-//        }
-//        return converted;
-//    }
-
+    // integer, number, date, (phone, email)
+    public static String convertDataTypeToEDCValidationType(String dataType){
+        return switch (dataType) {
+            case "date" -> "date";
+            case "integer", "boolean" -> "integer";
+            case "decimal", "count", "quantity", "duration" -> "number";
+            case "code", "datetime", "string", "identifier" -> "";
+            default -> "";
+        };
+    }
 
 }

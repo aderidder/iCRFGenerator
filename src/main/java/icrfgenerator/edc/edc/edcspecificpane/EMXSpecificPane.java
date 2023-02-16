@@ -30,14 +30,14 @@ import javafx.scene.layout.GridPane;
 
 /**
  * right side pane for castor
- * this allow EDC specific content
+ * this allows EDC specific content
  */
 public class EMXSpecificPane extends EDCSpecificPaneDefault {
     private ComboBox<String> dataTypesComboBox;
 
+    // ToDo: Decide whether to swith to the StandardFields
     private TextField minTextField;
     private TextField maxTextField;
-//    private TextField widthTextField;
     private CheckBox nillableCheckBox;
     private CheckBox aggregateableCheckBox;
 
@@ -46,47 +46,42 @@ public class EMXSpecificPane extends EDCSpecificPaneDefault {
     }
 
 
-    @Override
     /**
      * create the top pane for the borderpane
      * this pane contain our EDC specific fields
      */
+    @Override
     void setupTopPaneEDC(GridPane gridPane, int rowNum){
-        // add all the other items
-
 
         // create the combobox for the data types and add it
         gridPane.add(new Label(I18N.getLanguageText("emxDataType")), 0, ++rowNum);
-//        gridPane.add(new Label("emxDataType"), 0, ++rowNum);
         dataTypesComboBox  = new ComboBox<>();
         dataTypesComboBox.setPrefWidth(100);
         dataTypesComboBoxSetup();
         gridPane.add(dataTypesComboBox, 1, rowNum);
 
         gridPane.add(new Label(I18N.getLanguageText("emxNillable")), 0, ++rowNum);
-//        gridPane.add(new Label("emxNillable"), 0, ++rowNum);
         nillableCheckBox = new CheckBox();
         gridPane.add(nillableCheckBox, 1, rowNum);
 
         gridPane.add(new Label(I18N.getLanguageText("emxAggregateable")), 2, rowNum);
-//        gridPane.add(new Label("emxAggregateable"), 2, rowNum);
         aggregateableCheckBox = new CheckBox();
         gridPane.add(aggregateableCheckBox, 3, rowNum);
-
 
         Label minLabel = new Label(I18N.getLanguageText("emxMin"));
         gridPane.add(minLabel,0,++rowNum);
         minTextField = new TextField();
-        minTextField.setMaxWidth(40);
+        minTextField.setMaxWidth(75);
         gridPane.add(minTextField, 1, rowNum);
 
         Label maxLabel = new Label(I18N.getLanguageText("emxMax"));
         gridPane.add(maxLabel,2,rowNum);
         maxTextField = new TextField();
-        maxTextField.setMaxWidth(40);
+        maxTextField.setMaxWidth(75);
         gridPane.add(maxTextField, 3, rowNum);
-    }
 
+        setMinMaxDefaults();
+    }
 
     /**
      * add listeners to the fields
@@ -111,6 +106,9 @@ public class EMXSpecificPane extends EDCSpecificPaneDefault {
     }
 
 
+    /**
+     * load the values that are currently stored
+     */
     @Override
     void loadStoredValuesEDC() {
         EMXRunSettings runSettings = (EMXRunSettings) RunSettings.getInstance();
@@ -119,7 +117,6 @@ public class EMXSpecificPane extends EDCSpecificPaneDefault {
         aggregateableCheckBox.setSelected(runSettings.getSelectedItemAggregateableValue(key, itemId));
         minTextField.setText(runSettings.getSelectedItemMinValue(key, itemId));
         maxTextField.setText(runSettings.getSelectedItemMaxValue(key, itemId));
-        codelistPane.setSelectedFields();
     }
 
 
@@ -137,7 +134,7 @@ public class EMXSpecificPane extends EDCSpecificPaneDefault {
         }
 
         // attempt to find the item's datatype
-        String dataType = codebookItem.getDataType();
+        String dataType = codebookItem.getItemDataType();
         if(!dataType.equalsIgnoreCase("")){
             // attempt to convert it to Castor's data type
             String fieldType = EMXDefinition.convertDataTypeToEDCFieldType(dataType);
@@ -182,6 +179,41 @@ public class EMXSpecificPane extends EDCSpecificPaneDefault {
         aggregateableFieldChange();
         minFieldChange();
         maxFieldChange();
+    }
+
+    @Override
+    void storeAllValuesEDCGroupSelect(){
+        EMXRunSettings runSettings = (EMXRunSettings) RunSettings.getInstance();
+        storeDefaultDataType();
+        runSettings.updateItemNillableValue(key, itemId, false);
+        runSettings.updateItemAggregateableValue(key, itemId, false);
+
+        runSettings.updateItemRequiredValue(key, itemId, false);
+        runSettings.updateItemMinValue(key, itemId, codebookItem.getMin());
+        runSettings.updateItemMaxValue(key, itemId, codebookItem.getMax());
+    }
+
+    private void storeDefaultDataType(){
+        EMXRunSettings emxRunSettings = (EMXRunSettings) RunSettings.getInstance();
+        // attempt to find the item's datatype
+        String dataType = codebookItem.getItemDataType();
+        if(dataType.equalsIgnoreCase("")){
+            if(codebookItem.hasCodeList()){
+                emxRunSettings.updateItemDataType(key, itemId, EMXDefinition.getFieldTypesWithCodeList().get(0));
+            }
+            else{
+                emxRunSettings.updateItemDataType(key, itemId, EMXDefinition.getFieldTypesWithoutCodeList().get(0));
+            }
+        }
+        else{
+            emxRunSettings.updateItemDataType(key, itemId, EMXDefinition.convertDataTypeToEDCFieldType(dataType));
+        }
+    }
+
+
+    private void setMinMaxDefaults(){
+        maxTextField.setText(codebookItem.getMax());
+        minTextField.setText(codebookItem.getMin());
     }
 
     /**

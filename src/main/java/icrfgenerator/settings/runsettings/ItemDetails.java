@@ -19,16 +19,29 @@
 
 package icrfgenerator.settings.runsettings;
 
+import icrfgenerator.types.OperatorType;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
  * details of a selected item
+ * extended by all  edc specific item details
 */
 public class ItemDetails{
-    private String key;
-    private String itemId;
-    private List<String> codesList = new ArrayList<>();
+    private final String key;
+    private final String itemId;
+    private final List<String> codesList = new ArrayList<>();
+
+    // items which most EDCs will want to use
+    private String dataType;
+    private boolean required;
+    private String minValue="";
+    private String maxValue="";
+    private String units ="";
+
+    private OperatorType maxCheckOperator;
+    private OperatorType minCheckOperator;
 
     /**
      * itemdetails constructor
@@ -39,22 +52,6 @@ public class ItemDetails{
         this.key = key;
         this.itemId = itemId;
     }
-
-    /**
-     * clear the selected codes
-     */
-    void resetTerminology(){
-        codesList.clear();
-    }
-
-    /**
-     * the name of this item
-     * @return the name of the item
-     */
-//    String getItemName(){
-//        // as the codebook manager for the name of this item, based on the key (for the appropriate codebook) and our itemId
-//        return CodebookManager.getInstance().getItemName(key, itemId);
-//    }
 
     /**
      * add code & value the user just selected
@@ -74,7 +71,10 @@ public class ItemDetails{
         codesList.remove(code);
     }
 
-    void removeSelectedTerminologyCode(){
+    /**
+     * clear all selected codes
+     */
+    void removeSelectedTerminologyCodes(){
         codesList.clear();
     }
 
@@ -84,6 +84,118 @@ public class ItemDetails{
      */
     List<String> getSelectedTerminologyCodes(){
         return codesList;
+    }
+
+    /**
+     * returns the item's data type
+     * @return the item's data type
+     */
+    String getDataType(){
+        return dataType;
+    }
+
+    /**
+     * set the item's data type
+     * @param dataType the new item type
+     */
+    void setItemDataType(String dataType){
+        this.dataType = dataType;
+    }
+
+    /**
+     * get the item's required value
+     * @return the item's required value
+     */
+    boolean getItemRequiredValue(){
+        return required;
+    }
+
+    /**
+     * set the item's required value
+     * @param required the item's required value
+     */
+    void setItemRequiredValue(boolean required){
+        this.required=required;
+    }
+
+    /**
+     * get the item's min value
+     * @return the item's min value
+     */
+    String getItemMinValue(){
+        return minValue;
+    }
+
+    /**
+     * set the min value for this item
+     * @param minValue the max value
+     */
+    void setItemMinValue(String minValue){
+        this.minValue = minValue;
+    }
+
+    /**
+     * set the minimal check operator
+     * @param minCheckOperator the operator
+     */
+    void setItemMinCheckFieldValue(OperatorType minCheckOperator){
+        this.minCheckOperator = minCheckOperator;
+    }
+
+    /**
+     * get the minimal check operator
+     * @return the operator
+     */
+    OperatorType getItemMinCheckFieldValue(){
+        return minCheckOperator;
+    }
+
+    /**
+     * set the max value for this item
+     * @param maxValue the max value
+     */
+    void setItemMaxValue(String maxValue){
+        this.maxValue = maxValue;
+    }
+
+    /**
+     * get the maximum check operator
+     * @param maxCheckOperator the operator
+     */
+    void setItemMaxCheckFieldValue(OperatorType maxCheckOperator){
+        this.maxCheckOperator = maxCheckOperator;
+    }
+
+    /**
+     * get the maximum check operator
+     * @return the operator
+     */
+    OperatorType getItemMaxCheckFieldValue(){
+        return maxCheckOperator;
+    }
+
+    /**
+     * get the item's max value
+     * @return the item's max value
+     */
+    String getItemMaxValue(){
+        return maxValue;
+    }
+
+    /**
+     * get the item's width value
+     * @return the item's width value
+     */
+    String getItemUnitsValue(){
+        return units;
+    }
+
+    /**
+     * set the item's units value
+     * @param units the item's units value
+     */
+    void setItemUnitsValue(String units){
+        this.units = units;
     }
 
 }

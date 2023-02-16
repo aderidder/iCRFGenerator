@@ -22,6 +22,8 @@ package icrfgenerator.edc.edc.edcrunsettings.emx;
 import icrfgenerator.edc.edc.EDC;
 import icrfgenerator.settings.runsettings.RunSettings;
 
+import java.util.List;
+
 /**
  * EMX specific runsettings
  */
@@ -49,33 +51,16 @@ public class EMXRunSettings extends RunSettings {
     }
 
     /**
-     * update the data type of an item in a codebook+version+language
-     * @param key codebook+version+language
-     * @param itemId item to update
-     * @param dataType the new data type
-     */
-    public void updateItemDataType(String key, String itemId, String dataType){
-        getSelectedItems(key).updateItemDataType(itemId,dataType);
-    }
-
-    /**
-     * get the selected data type for an item in a codebook+version+language
-     * @param key codebook+version+language
-     * @param itemId id of item
-     * @return data type
-     */
-    public String getSelectedItemDataType(String key, String itemId){
-        return getSelectedItems(key).getSelectedItemDataType(itemId);
-    }
-
-    /**
      * update the aggregateable value
      * @param key codebook+version+language
      * @param itemId item to update
      * @param required the new aggregateable value
      */
     public void updateItemAggregateableValue(String key, String itemId, boolean required){
-        getSelectedItems(key).updateItemAggregateableValue(itemId,required);
+        List<String> allKeys = RunSettings.getInstance().getAllLanguageKeysForMainKey(key);
+        allKeys.forEach(t->
+            getSelectedItems(t).updateItemAggregateableValue(itemId,required)
+        );
     }
 
     /**
@@ -85,7 +70,10 @@ public class EMXRunSettings extends RunSettings {
      * @param required the new nillable value
      */
     public void updateItemNillableValue(String key, String itemId, boolean required){
-        getSelectedItems(key).updateItemNillableValue(itemId,required);
+        List<String> allKeys = RunSettings.getInstance().getAllLanguageKeysForMainKey(key);
+        allKeys.forEach(t->
+            getSelectedItems(t).updateItemNillableValue(itemId,required)
+        );
     }
 
     /**
@@ -108,64 +96,4 @@ public class EMXRunSettings extends RunSettings {
         return getSelectedItems(key).getSelectedItemNillableValue(itemId);
     }
 
-//
-//    /**
-//     * returns the item's width value
-//     * @param key codebook+version+language
-//     * @param itemId item to update
-//     * @return the item's width value
-//     */
-//    public String getSelectedItemWidthValue(String key, String itemId){
-//        return getSelectedItems(key).getSelectedItemWidthValue(itemId);
-//    }
-//
-    /**
-     * update the min value
-     * @param key codebook+version+language
-     * @param itemId item to update
-     * @param minValue the new min value
-     */
-    public void updateItemMinValue(String key, String itemId, String minValue){
-        getSelectedItems(key).updateItemMinValue(itemId,minValue);
-    }
-
-    /**
-     * update the max value
-     * @param key codebook+version+language
-     * @param itemId item to update
-     * @param maxValue the new max value
-     */
-    public void updateItemMaxValue(String key, String itemId, String maxValue){
-        getSelectedItems(key).updateItemMaxValue(itemId,maxValue);
-    }
-
-    /**
-     * returns the item's min value
-     * @param key codebook+version+language
-     * @param itemId item to update
-     * @return the item's min value
-     */
-    public String getSelectedItemMinValue(String key, String itemId){
-        return getSelectedItems(key).getSelectedItemMinValue(itemId);
-    }
-
-    /**
-     * returns the item's max value
-     * @param key codebook+version+language
-     * @param itemId item to update
-     * @return the item's max value
-     */
-    public String getSelectedItemMaxValue(String key, String itemId){
-        return getSelectedItems(key).getSelectedItemMaxValue(itemId);
-    }
-//
-//    /**
-//     * update the width value
-//     * @param key codebook+version+language
-//     * @param itemId item to update
-//     * @param widthValue the new width value
-//     */
-//    public void updateItemWidthValue(String key, String itemId, String widthValue){
-//        getSelectedItems(key).updateItemWidthValue(itemId,widthValue);
-//    }
 }

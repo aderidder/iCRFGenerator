@@ -25,13 +25,8 @@ import icrfgenerator.settings.runsettings.ItemDetails;
  * EMX specific item details
  */
 class EMXItemDetails extends ItemDetails {
-    private String dataType;
-    private String minValue="";
-    private String maxValue="";
-//    private String width="";
     private boolean aggregateable;
     private boolean nillable;
-    
 
     /**
      * constructor
@@ -41,70 +36,6 @@ class EMXItemDetails extends ItemDetails {
     EMXItemDetails(String key, String itemId){
         super(key, itemId);
     }
-
-    /**
-     * set the item's data type
-     * @param dataType the new item type
-     */
-    void setItemDataType(String dataType){
-        this.dataType = dataType;
-    }
-
-    /**
-     * returns the item's data type
-     * @return the item's data type
-     */
-    String getDataType(){
-        return dataType;
-    }
-
-    /**
-     * set the minvalue for this item
-     * @param minValue the min value
-     */
-    void setItemMinValue(String minValue){
-        this.minValue = minValue;
-    }
-
-    /**
-     * set the max value for this item
-     * @param maxValue the max value
-     */
-    void setItemMaxValue(String maxValue){
-        this.maxValue = maxValue;
-    }
-
-    /**
-     * get the item's min value
-     * @return the item's min value
-     */
-    String getItemMinValue(){
-        return minValue;
-    }
-
-    /**
-     * get the item's max value
-     * @return the item's max value
-     */
-    String getItemMaxValue(){
-        return maxValue;
-    }
-//
-//    /**
-//     * set the item's width value
-//     * @param width the item's width value
-//     */
-//    void setItemWidthValue(String width){
-//        this.width = width;
-//    }
-//
-//    /**
-//     * get the item's width value
-//     * @return the item's width value
-//     */
-//    String getItemWidthValue(){
-//        return width;
-//    }
 
     /**
      * set the item's aggregateable value
@@ -137,8 +68,5 @@ class EMXItemDetails extends ItemDetails {
     boolean getItemNillableValue(){
         return nillable;
     }
-
-
-
 
 }

@@ -30,26 +30,21 @@ import javafx.scene.layout.GridPane;
 
 /**
  * right side pane for castor
- * this allow EDC specific content
+ * this allows EDC specific content
  */
-public class CastorSpecificPane extends EDCSpecificPaneDefault {
+public class CastorSpecificPane extends EDCSpecificPaneDefaultCommonFields {
     private ComboBox<String> fieldTypesComboBox;
-
-    private TextField minTextField;
-    private TextField maxTextField;
-    private TextField widthTextField;
-    private CheckBox requiredCheckBox;
+    private CheckBox enforceDecimalsCheckBox;
 
     public CastorSpecificPane(){
 
     }
 
-
-    @Override
     /**
      * create the top pane for the borderpane
      * this pane contain our EDC specific fields
      */
+    @Override
     void setupTopPaneEDC(GridPane gridPane, int rowNum){
         // add all the other items
         gridPane.add(new Label(I18N.getLanguageText("castorFieldType")), 0, ++rowNum);
@@ -58,58 +53,137 @@ public class CastorSpecificPane extends EDCSpecificPaneDefault {
         fieldTypesComboBoxSetup();
         gridPane.add(fieldTypesComboBox, 1, rowNum);
 
-        gridPane.add(new Label(I18N.getLanguageText("castorRequired")), 2, rowNum);
-        requiredCheckBox = new CheckBox();
-        gridPane.add(requiredCheckBox, 3, rowNum);
+        setupTopPaneCommonFields(gridPane, rowNum);
 
-        Label minLabel = new Label(I18N.getLanguageText("castorMin"));
-        gridPane.add(minLabel,0,++rowNum);
-        minTextField = new TextField();
-        minTextField.setMaxWidth(40);
-        gridPane.add(minTextField, 1, rowNum);
+        gridPane.add(new Label(I18N.getLanguageText("castorPrecision")), 2, rowNum);
+        enforceDecimalsCheckBox = new CheckBox();
+        gridPane.add(enforceDecimalsCheckBox, 3, rowNum);
 
-        Label maxLabel = new Label(I18N.getLanguageText("castorMax"));
-        gridPane.add(maxLabel,2,rowNum);
-        maxTextField = new TextField();
-        maxTextField.setMaxWidth(40);
-        gridPane.add(maxTextField, 3, rowNum);
-
-        gridPane.add(new Label(I18N.getLanguageText("castorWidth")), 0, ++rowNum);
-        widthTextField = new TextField();
-        widthTextField.setMaxWidth(40);
-        widthTextField.setTooltip(new Tooltip(I18N.getLanguageText("castorWidthHelp")));
-        gridPane.add(widthTextField, 1, rowNum);
-
+        enforceDecimalsCheckBox.setSelected(Integer.parseInt(codebookItem.getPrecision())>0);
     }
-
 
     /**
      * add listeners to the fields
      */
     @Override
-    void addListenersEDC(){
+    void addListenersEDC_local(){
         fieldTypesComboBox.setOnAction(event -> {
             fieldTypeChange();
             checkConditionalEnables();
+            checkMustEnableMinMaxUnits();
         });
-        minTextField.textProperty().addListener((observable, oldValue, newValue) -> minFieldChange());
-        maxTextField.textProperty().addListener((observable, oldValue, newValue) -> maxFieldChange());
-        requiredCheckBox.setOnAction(event -> requiredFieldChange());
-        widthTextField.textProperty().addListener((observable, oldValue, newValue) -> widthFieldChange());
+        enforceDecimalsCheckBox.setOnAction(event -> enforceDecimalsFieldChange());
     }
 
-
+    /**
+     * load the values that are currently stored
+     */
     @Override
-    void loadStoredValuesEDC() {
+    void loadStoredValuesEDC_local() {
         CastorRunSettings runSettings = (CastorRunSettings) RunSettings.getInstance();
         fieldTypesComboBox.setValue(runSettings.getSelectedItemFieldType(key,itemId));
-        requiredCheckBox.setSelected(runSettings.getSelectedItemRequiredValue(key, itemId));
-        minTextField.setText(runSettings.getSelectedItemMinValue(key, itemId));
-        maxTextField.setText(runSettings.getSelectedItemMaxValue(key, itemId));
-        widthTextField.setText(runSettings.getSelectedItemWidthValue(key, itemId));
-        codelistPane.setSelectedFields();
+        enforceDecimalsCheckBox.setSelected(runSettings.getSelectedItemEnforceDecimalsValue(key, itemId));
     }
 
+    /**
+     * disable fields
+     */
+    @Override
+    void disableFieldsEDC_local(){
+        fieldTypesComboBox.setDisable(true);
+        enforceDecimalsCheckBox.setDisable(true);
+    }
+
+    /**
+     * enabled fields
+     */
+    @Override
+    void enableFieldsEDC_local(){
+        fieldTypesComboBox.setDisable(false);
+        checkConditionalEnables();
+    }
+
+    /**
+     * enable / disable local fields
+     */
+    private void checkConditionalEnables(){
+        if(checkMustEnableMinMaxUnits_local()){
+            enforceDecimalsCheckBox.setDisable(false);
+        }
+        else{
+            enforceDecimalsCheckBox.setSelected(false);
+            enforceDecimalsCheckBox.setDisable(true);
+        }
+    }
+
+    /**
+     * store all values
+     */
+    @Override
+    void storeAllValuesEDC_local(){
+        fieldTypeChange();
+        enforceDecimalsFieldChange();
+    }
+
+    /**
+     * store values when an item is selected via groupselect
+     */
+    @Override
+    void storeAllValuesEDCGroupSelect_local(){
+        storeDefaultFieldType();
+        CastorRunSettings runSettings = (CastorRunSettings) RunSettings.getInstance();
+        runSettings.updateItemEnforceDecimalsValue(key, itemId, Integer.parseInt(codebookItem.getPrecision())>0);
+    }
+
+    /**
+     * decides whether the min / max / units fields must be enabled or disabled
+     * @return true/false
+     */
+    @Override
+    boolean checkMustEnableMinMaxUnits_local(){
+        String selectedItem = fieldTypesComboBox.getSelectionModel().getSelectedItem();
+        if(selectedItem==null){
+            return false;
+        }
+        return selectedItem.equalsIgnoreCase("numeric");
+    }
+
+    /**
+     * used by the group select to ensure the default value is stored
+     */
+    private void storeDefaultFieldType(){
+        CastorRunSettings runSettings = (CastorRunSettings) RunSettings.getInstance();
+        String dataType = codebookItem.getItemDataType();
+        // If there is no datatype, select the first value from either the fieldTypesWithoutCodelist or fieldTypesWithoutCodelist
+        if(dataType.equalsIgnoreCase("")){
+            if(codebookItem.hasCodeList()){
+                runSettings.updateItemFieldType(key, itemId, CastorDefinition.getFieldTypesWithCodeList().get(0));
+            }
+            else{
+                runSettings.updateItemFieldType(key, itemId, CastorDefinition.getFieldTypesWithoutCodeList().get(0));
+            }
+        }
+        else {
+            runSettings.updateItemFieldType(key, itemId, CastorDefinition.convertDataTypeToEDCFieldType(dataType));
+        }
+    }
+
+    /**
+     * update the fieldType
+     */
+    private void fieldTypeChange(){
+        String selectedItem = fieldTypesComboBox.getSelectionModel().getSelectedItem();
+        CastorRunSettings runSettings = (CastorRunSettings) RunSettings.getInstance();
+        runSettings.updateItemFieldType(key, itemId, selectedItem);
+    }
+
+    /**
+     * update the stored enforceDecimals value
+     */
+    private void enforceDecimalsFieldChange(){
+        CastorRunSettings runSettings = (CastorRunSettings) RunSettings.getInstance();
+        runSettings.updateItemEnforceDecimalsValue(key, itemId, enforceDecimalsCheckBox.isSelected());
+    }
 
     /**
      * setup for the fieldTypes combobox
@@ -125,7 +199,7 @@ public class CastorSpecificPane extends EDCSpecificPaneDefault {
         }
 
         // attempt to find the item's datatype
-        String dataType = codebookItem.getDataType();
+        String dataType = codebookItem.getItemDataType();
         if(!dataType.equalsIgnoreCase("")){
             // attempt to convert it to Castor's data type
             String fieldType = CastorDefinition.convertDataTypeToEDCFieldType(dataType);
@@ -135,164 +209,5 @@ public class CastorSpecificPane extends EDCSpecificPaneDefault {
             // if there is no datatype for this item, select the first item in the list
             fieldTypesComboBox.getSelectionModel().selectFirst();
         }
-    }
-
-    /**
-     * disable fields
-     */
-    @Override
-    void disableFieldsEDC(){
-        fieldTypesComboBox.setDisable(true);
-        setDisableRequired(true);
-        setDisableWidth(true);
-        setDisableMinMax(true);
-        codelistPane.disableFields();
-    }
-
-    /**
-     * enabled fields
-     */
-    @Override
-    void enableFieldsEDC(){
-        fieldTypesComboBox.setDisable(false);
-        setDisableRequired(false);
-        checkConditionalEnables();
-    }
-
-    /**
-     * store the changes in the runsettings
-     */
-    @Override
-    void storeAllValuesEDC(){
-        fieldTypeChange();
-        requiredFieldChange();
-        minFieldChange();
-        maxFieldChange();
-        widthFieldChange();
-    }
-
-    /**
-     * the field type has changed. Update its value and perform additional actions
-     */
-    private void fieldTypeChange(){
-        String selectedItem = fieldTypesComboBox.getSelectionModel().getSelectedItem();
-        CastorRunSettings runSettings = (CastorRunSettings) RunSettings.getInstance();
-        runSettings.updateItemFieldType(key, itemId, selectedItem);
-    }
-
-    /**
-     * check whether fields that depend on the fieldType's value should be enabled
-     */
-    private void checkConditionalEnables(){
-        if (mustEnableMinMax()) {
-            setDisableMinMax(false);
-        }
-        else {
-            clearMinMax();
-            setDisableMinMax(true);
-        }
-        if(mustEnableWidth()){
-            setDisableWidth(false);
-        }
-        else{
-            clearWidth();
-            setDisableWidth(true);
-        }
-    }
-
-    /**
-     * en/disable the required field
-     * @param disable true/false
-     */
-    private void setDisableRequired(boolean disable){
-        requiredCheckBox.setDisable(disable);
-    }
-
-    /**
-     * update the stored Required value
-     */
-    private void requiredFieldChange(){
-        CastorRunSettings runSettings = (CastorRunSettings) RunSettings.getInstance();
-        runSettings.updateItemRequiredValue(key, itemId, requiredCheckBox.isSelected());
-    }
-
-    /**
-     * clear the min/max fields
-     */
-    private void clearMinMax(){
-        maxTextField.setText("");
-        minTextField.setText("");
-    }
-
-    /**
-     * disable the min/max fields
-     * @param disable true/false
-     */
-    private void setDisableMinMax(boolean disable){
-        minTextField.setDisable(disable);
-        maxTextField.setDisable(disable);
-    }
-
-    /**
-     * returns whether the min/max fields should be enabled/disabled
-     * @return true/false
-     */
-    private boolean mustEnableMinMax(){
-        String selectedItem = fieldTypesComboBox.getSelectionModel().getSelectedItem();
-        if(selectedItem==null){
-            return false;
-        }
-        return selectedItem.equalsIgnoreCase("numeric");
-    }
-
-    /**
-     * update the stored Min value
-     */
-    private void minFieldChange(){
-        CastorRunSettings runSettings = (CastorRunSettings) RunSettings.getInstance();
-        runSettings.updateItemMinValue(key, itemId, minTextField.getText());
-    }
-
-    /**
-     * update the stored Max value
-     */
-    private void maxFieldChange(){
-        CastorRunSettings runSettings = (CastorRunSettings) RunSettings.getInstance();
-        runSettings.updateItemMaxValue(key, itemId, maxTextField.getText());
-    }
-
-    /**
-     * clear the width field
-     */
-    private void clearWidth(){
-        widthTextField.setText("");
-    }
-
-    /**
-     * en/disables the width field
-     * @param disable true/false
-     */
-    private void setDisableWidth(boolean disable){
-        widthTextField.setDisable(disable);
-    }
-
-    /**
-     * check whether to enable the width field
-     * @return true/false
-     */
-    private boolean mustEnableWidth(){
-        String selectedItem = fieldTypesComboBox.getSelectionModel().getSelectedItem();
-        if(selectedItem==null){
-            return false;
-        }
-        return selectedItem.equalsIgnoreCase("numeric") || selectedItem.equalsIgnoreCase("string");
-    }
-
-    /**
-     * update the stored width field
-     */
-    private void widthFieldChange(){
-        CastorRunSettings runSettings = (CastorRunSettings) RunSettings.getInstance();
-        runSettings.updateItemWidthValue(key, itemId, widthTextField.getText());
     }
 }

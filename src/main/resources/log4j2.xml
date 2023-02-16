@@ -27,10 +27,21 @@
             <PatternLayout pattern="%c{1}:%L - %m%n"/>
         </Console>
         <File name="FileAppender" fileName="myoutput.log" append="false">
-            <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} - %m%n"/>
+            <PatternLayout pattern="%c{1}:%L - %m%n"/>
         </File>
     </Appenders>
     <Loggers>
+        <!-- for the external openehr and nedap packages we'll take the error messages -->
+        <Logger name="org.openehr" level="error" additivity="false">
+            <AppenderRef ref="LogAreaLogger"/>
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FileAppender"/>
+        </Logger>
+        <Logger name="com.nedap" level="error" additivity="false">
+            <AppenderRef ref="LogAreaLogger"/>
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FileAppender"/>
+        </Logger>
         <Root level="debug">
             <AppenderRef ref="LogAreaLogger" level="info"/>
             <AppenderRef ref="STDOUT" level="info"/>

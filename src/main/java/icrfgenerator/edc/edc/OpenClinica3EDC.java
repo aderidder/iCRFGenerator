@@ -27,6 +27,7 @@ import icrfgenerator.edc.edc.edcspecificpane.OpenClinica3SpecificPane;
 import icrfgenerator.resourcemanagement.ResourceManager;
 import icrfgenerator.settings.runsettings.RunSettings;
 import icrfgenerator.edc.edc.edcrunsettings.openclinica3.OpenClinica3RunSettings;
+import icrfgenerator.types.OperatorType;
 import icrfgenerator.utils.StringUtils;
 import javafx.stage.FileChooser;
 import org.apache.logging.log4j.Level;
@@ -49,13 +50,15 @@ import java.util.stream.Collectors;
 public class OpenClinica3EDC extends EDCDefault{
     private Workbook workbook;
     private static final String sectionLabel="Section1";
-    private static final int nrCellsOnItemsSheet = 27;
-    private static final int nrCellsOnSectionsSheet = 6;
+    private static final int nrCellsOnItemsSheet = ItemColumns.values().length;
+    private static final int nrCellsOnSectionsSheet = SectionsColumns.values().length;
+
+    private String curLanguage;
 
     private static final Logger logger = LogManager.getLogger(OpenClinica3EDC.class.getName());
 
     public OpenClinica3EDC(){
-        super("OpenClinica 3");
+        super("LibreClinica / OpenClinica 3");
     }
 
     /**
@@ -79,7 +82,8 @@ public class OpenClinica3EDC extends EDCDefault{
      * add data to the template
      */
     @Override
-    public void generateCRF() {
+    public void generateCRF(List<String> keys, String language) {
+        this.curLanguage = language;
         OpenClinica3RunSettings runSettings = (OpenClinica3RunSettings) RunSettings.getInstance();
         CodebookManager codebookManager = CodebookManager.getInstance();
 
@@ -87,39 +91,37 @@ public class OpenClinica3EDC extends EDCDefault{
 
         Sheet sheet = workbook.getSheet("Items");
 
-        // get all the keys (codebook + datasetId + language)
-        List<String> keys = runSettings.getKeys();
         for (String key : keys) {
             // retrieve the selected items for the key and add each item to the template
             List<String> selectedItemIds = runSettings.getSelectedItemIdentifiers(key);
             for (String itemId : selectedItemIds) {
-                String dataType = runSettings.getSelectedItemDataType(key, itemId);
-                String fieldType = runSettings.getSelectedItemFieldType(key, itemId);
-
-                // get the codebookItem to retrieve some information which is not dynamic
-                // such as the item's name and its ontology values
-                CodebookItem codebookItem = codebookManager.getCodebookItem(key, itemId);
-                String itemName = codebookItem.getItemName();
-                String ontologyCode = codebookItem.getCode();
-
-                String ocDescriptionString=codebookItem.getDescription()+" | ";
-                if(!ontologyCode.equalsIgnoreCase("")) {
-                    String ontologyCodeSystem = codebookItem.getCodeSystem();
-                    String ontologyDescription = codebookItem.getCodeDescription();
-                    ocDescriptionString += ontologyDescription + " ("+ontologyCodeSystem + ": " + ontologyCode+") | ";
-                }
-
-                // check whether the selected item can have an associated codelist
+                // create rows
                 if (codebookManager.codebookItemHasCodeList(key, itemId)) {
-                    List<String> selectedCodes = runSettings.getSelectedItemSelectedTerminologyCodes(key, itemId);
-//                    createTerminologyRow(sheet, key, itemId, itemName, dataType, fieldType, String.join(", ", selectedCodes), selectedCodes.stream().map(t -> StringUtils.escapeCommas(codebookManager.getValueForCode(key, itemId, t))).collect(Collectors.joining(", ")));
-                    createTerminologyRow(sheet, ocDescriptionString, itemId, itemName, dataType, fieldType, String.join(", ", selectedCodes), selectedCodes.stream().map(t -> StringUtils.escapeCommas(codebookManager.getValueForCode(key, itemId, t))).collect(Collectors.joining(", ")));
+                    createTerminologyRow(sheet, key, itemId);
                 } else {
-//                    createNonTerminologyRow(sheet, key, itemId, itemName, dataType, fieldType);
-                    createNonTerminologyRow(sheet, ocDescriptionString, itemId, itemName, dataType, fieldType);
+                    createNonTerminologyRow(sheet, key, itemId);
                 }
             }
         }
+    }
+
+    /**
+     * create description field
+     * @param key    key
+     * @param itemId itemId
+     * @return description field
+     */
+    private String generateOCDescription(String key, String itemId){
+        CodebookItem codebookItem = CodebookManager.getInstance().getCodebookItem(key, itemId);
+        String ontologyCode = codebookItem.getCodeForItem();
+
+        String ocDescriptionString=codebookItem.getItemDescription()+" | ";
+        if(!ontologyCode.equalsIgnoreCase("")) {
+            String ontologyCodeSystem = codebookItem.getCodeSystemForItem();
+            String ontologyDescription = codebookItem.getItemCodeDescription();
+            ocDescriptionString += ontologyDescription + " ("+ontologyCodeSystem + ": " + ontologyCode+") | ";
+        }
+        return ocDescriptionString;
     }
 
     /**
@@ -150,6 +152,9 @@ public class OpenClinica3EDC extends EDCDefault{
         }
     }
 
+    /**
+     * Fill the section sheet
+     */
     private void addSection(){
         Sheet sheet = workbook.getSheet("Sections");
         Row row = createEmptyRow(sheet, nrCellsOnSectionsSheet);
@@ -172,29 +177,46 @@ public class OpenClinica3EDC extends EDCDefault{
      * creata a row for an item which has terminology
      * @param sheet sheet to which to add the row
      * @param key key of the item
-     * @param itemName name of the item
-     * @param dataType datatype of the item
-     * @param fieldType fieldtype of the item
-     * @param codes codes of the codelist
-     * @param values values of the codelist
      */
-    private void createTerminologyRow(Sheet sheet, String key, String itemId, String itemName, String dataType, String fieldType, String codes, String values){
+    private void createTerminologyRow(Sheet sheet, String key, String itemId){
         Row row = createEmptyRow(sheet, nrCellsOnItemsSheet);
-        addGeneralValues(row, key, itemId, itemName, dataType, fieldType);
-        addTerminologyValues(row, itemName, fieldType, codes, values);
+        addGeneralValues(row, key, itemId);
+        addTerminologyValues(row, key, itemId);
     }
 
     /**
      * creata a row for an item which does not have terminology
      * @param sheet sheet to which to add the row
      * @param key key of the item
-     * @param itemName name of the item
-     * @param dataType datatype of the item
-     * @param fieldType fieldtype of the item
      */
-    private void createNonTerminologyRow(Sheet sheet, String key, String itemId, String itemName, String dataType, String fieldType){
+    private void createNonTerminologyRow(Sheet sheet, String key, String itemId){
         Row row = createEmptyRow(sheet, nrCellsOnItemsSheet);
-        addGeneralValues(row, key, itemId, itemName, dataType, fieldType);
+        addGeneralValues(row, key, itemId);
+        addValidations(row, key, itemId);
+    }
+
+    private void addValidations(Row row, String key, String itemId){
+        RunSettings runSettings = RunSettings.getInstance();
+        String maxValue = runSettings.getSelectedItemMaxValue(key, itemId);
+        OperatorType operatorTypeMaxValue = runSettings.getSelectedItemMaxCheckOperator(key, itemId);
+        String minValue = runSettings.getSelectedItemMinValue(key, itemId);
+        OperatorType operatorTypeMinValue = runSettings.getSelectedItemMinCheckOperator(key, itemId);
+        boolean addMaxCheck = !maxValue.equalsIgnoreCase("") && !operatorTypeMaxValue.equals(OperatorType.NONE);
+        boolean addMinCheck = !minValue.equalsIgnoreCase("") && !operatorTypeMinValue.equals(OperatorType.NONE);
+
+        if(addMaxCheck && addMinCheck){
+            row.getCell(ItemColumns.VALIDATION.index).setCellValue("func:range("+minValue+","+maxValue+")");
+            String errorMessage = operatorTypeMinValue.getErrorMessage(curLanguage, minValue)+"; "+operatorTypeMaxValue.getErrorMessage(curLanguage, maxValue);
+            row.getCell(ItemColumns.VALIDATION_ERROR_MESSAGE.index).setCellValue(errorMessage);
+        }
+        else if(addMaxCheck){
+            row.getCell(ItemColumns.VALIDATION.index).setCellValue("func:"+ operatorTypeMaxValue.getTextLabel().toLowerCase()+"("+maxValue+")");
+            row.getCell(ItemColumns.VALIDATION_ERROR_MESSAGE.index).setCellValue(operatorTypeMaxValue.getErrorMessage(curLanguage, maxValue));
+        }
+        else if(addMinCheck){
+            row.getCell(ItemColumns.VALIDATION.index).setCellValue("func:"+ operatorTypeMinValue.getTextLabel().toLowerCase()+"("+minValue+")");
+            row.getCell(ItemColumns.VALIDATION_ERROR_MESSAGE.index).setCellValue(operatorTypeMinValue.getErrorMessage(curLanguage, minValue));
+        }
     }
 
     /**
@@ -214,28 +236,39 @@ public class OpenClinica3EDC extends EDCDefault{
      * sets general cell values
      * @param row row
      * @param key key
-     * @param itemName item name
-     * @param dataType data type
-     * @param fieldType field type
      */
-    private void addGeneralValues(Row row, String key, String itemId, String itemName, String dataType, String fieldType){
+    private void addGeneralValues(Row row, String key, String itemId){
+        OpenClinica3RunSettings runSettings = (OpenClinica3RunSettings) RunSettings.getInstance();
+        CodebookItem codebookItem = CodebookManager.getInstance().getCodebookItem(key, itemId);
+        String itemName = codebookItem.getItemName();
+
         row.getCell(ItemColumns.ITEM_NAME.index).setCellValue(StringUtils.removeSpacesFromString(makeUnique(itemName)));
-        row.getCell(ItemColumns.DESCRIPTION_LABEL.index).setCellValue(key+"itemId: "+itemId);
+        row.getCell(ItemColumns.DESCRIPTION_LABEL.index).setCellValue(generateOCDescription(key, itemId));
         row.getCell(ItemColumns.SECTION_LABEL.index).setCellValue(sectionLabel);
         row.getCell(ItemColumns.LEFT_ITEM_TEXT.index).setCellValue(itemName);
-        row.getCell(ItemColumns.RESPONSE_TYPE.index).setCellValue(fieldType);
-        row.getCell(ItemColumns.DATA_TYPE.index).setCellValue(dataType);
+        row.getCell(ItemColumns.RESPONSE_TYPE.index).setCellValue(runSettings.getSelectedItemFieldType(key, itemId));
+        row.getCell(ItemColumns.DATA_TYPE.index).setCellValue(runSettings.getSelectedItemDataType(key, itemId));
+        row.getCell(ItemColumns.UNITS.index).setCellValue(runSettings.getSelectedItemUnitsValue(key, itemId));
+        row.getCell(ItemColumns.REQUIRED.index).setCellValue(runSettings.getSelectedItemRequiredValue(key, itemId)?"1":"");
     }
 
     /**
      * sets terminology cell values
      * @param row row
-     * @param itemName itemname
-     * @param fieldType fieldtype
-     * @param codes codes
-     * @param values values
      */
-    private void addTerminologyValues(Row row, String itemName, String fieldType, String codes, String values){
+    private void addTerminologyValues(Row row, String key, String itemId){
+        OpenClinica3RunSettings runSettings = (OpenClinica3RunSettings) RunSettings.getInstance();
+        CodebookManager codebookManager = CodebookManager.getInstance();
+        CodebookItem codebookItem = codebookManager.getCodebookItem(key, itemId);
+
+        String itemName = codebookItem.getItemName();
+        String fieldType = runSettings.getSelectedItemFieldType(key, itemId);
+        List<String> selectedCodes = runSettings.getSelectedItemSelectedTerminologyCodes(key, itemId);
+//        String values = String.join(", ", selectedCodes);
+//        String codes = selectedCodes.stream().map(t -> StringUtils.escapeCommas(codebookManager.getValueForOptionCode(key, itemId, t))).collect(Collectors.joining(", "));
+        String codes = String.join(", ", selectedCodes);
+        String values = selectedCodes.stream().map(t -> StringUtils.escapeCommas(codebookManager.getValueForOptionCode(key, itemId, t))).collect(Collectors.joining(", "));
+
         row.getCell(ItemColumns.RESPONSE_LABEL.index).setCellValue(fieldType+"_"+ StringUtils.removeSpacesFromString(itemName));
         row.getCell(ItemColumns.RESPONSE_OPTIONS_TEXT.index).setCellValue(checkLength(itemName, values));
         row.getCell(ItemColumns.RESPONSE_VALUES_OR_CALCULATIONS.index).setCellValue(checkLength(itemName, codes));
@@ -244,6 +277,12 @@ public class OpenClinica3EDC extends EDCDefault{
         }
     }
 
+    /**
+     * check whether the length of the string is within the allowed length in Excel
+     * @param itemName item name
+     * @param value    value to check
+     * @return the string or a message that the value is too long
+     */
     private static String checkLength(String itemName, String value){
         if(value.length()>32766){
             logger.log(Level.ERROR, itemName+" has codes/values that exceed Excel's maximum field length. Please select fewer options...");
@@ -293,7 +332,11 @@ public class OpenClinica3EDC extends EDCDefault{
 
     private enum SectionsColumns{
         SECTION_LABEL (0),
-        SECTION_TITLE (1);
+        SECTION_TITLE (1),
+        SUBTITLE (2),
+        INSTRUCTIONS (3),
+        PAGE_NUMBER (4),
+        PARENT_SECTION (5);
 
         private final int index;
 

@@ -16,4 +16,4 @@ REM
 REM You should have received a copy of the GNU General Public License
 REM along with iCRFGenerator. If not, see <http://www.gnu.org/licenses/>
 @echo on
-java-runtime\bin\java --add-opens javafx.graphics/javafx.scene=ALL-UNNAMED -cp iCRFGenerator.jar;.\lib\* icrfgenerator.CRFGenerator
+java-runtime\bin\java --add-opens javafx.graphics/javafx.scene=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED -Dfile.encoding=UTF-8 -cp iCRFGenerator.jar;.\lib\* icrfgenerator.CRFGenerator

@@ -29,21 +29,12 @@ import java.io.File;
  * Stuff each EDC should be able to do to be compatible
  */
 public interface EDC {
-    /**
-     * add data to a crf
-     */
-    void generateCRF();
 
     /**
-     * write the crf to disk
-     * @param file name of the output file
+     * Generate crfs
+     * @param file base filename
      */
-    void writeFile(File file);
-
-    /**
-     * do setup things for the edc, such as opening a template
-     */
-    void setup();
+    void generateCRFs(File file);
 
     /**
      * returns the EDC's right side pane for the GUI

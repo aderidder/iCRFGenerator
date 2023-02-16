@@ -67,74 +67,21 @@ public class CastorSelectedItemsContainer extends SelectedItemsContainer {
     }
 
     /**
-     * update the min value of the item
+     * update the enforce decimals value of the item
      * @param itemId id of the item
-     * @param value the new min value
+     * @param value the new enforce decimals value
      */
-    void updateItemMinValue(String itemId, String value){
-        getItemDetails(itemId).setItemMinValue(value);
+    void updateItemEnforceDecimalsValue(String itemId, boolean value){
+        getItemDetails(itemId).setItemEnforceDecimalsValue(value);
     }
 
     /**
-     * update the max value of the item
+     * returns the enforce decimals value of the item
      * @param itemId id of the item
-     * @param value the new max value
+     * @return the enforce decimals value
      */
-    void updateItemMaxValue(String itemId, String value){
-        getItemDetails(itemId).setItemMaxValue(value);
+    boolean getSelectedItemEnforceDecimalsValue(String itemId){
+        return getItemDetails(itemId).getItemEnforceDecimalsValue();
     }
 
-    /**
-     * returns the min value of the item
-     * @param itemId id of the item
-     * @return the min value
-     */
-    String getSelectedItemMinValue(String itemId){
-        return getItemDetails(itemId).getItemMinValue();
-    }
-
-    /**
-     * returns the max value of the item
-     * @param itemId id of the item
-     * @return the max value
-     */
-    String getSelectedItemMaxValue(String itemId){
-        return getItemDetails(itemId).getItemMaxValue();
-    }
-
-    /**
-     * update the required value of the item
-     * @param itemId id of the item
-     * @param value the new required value
-     */
-    void updateItemRequiredValue(String itemId, boolean value){
-        getItemDetails(itemId).setItemRequiredValue(value);
-    }
-
-    /**
-     * update the width value of the item
-     * @param itemId id of the item
-     * @param value the new widthvalue
-     */
-    void updateItemWidthValue(String itemId, String value){
-        getItemDetails(itemId).setItemWidthValue(value);
-    }
-
-    /**
-     * returns the required value of the item
-     * @param itemId id of the item
-     * @return the required value
-     */
-    boolean getSelectedItemRequiredValue(String itemId){
-        return getItemDetails(itemId).getItemRequiredValue();
-    }
-
-    /**
-     * returns the width value of the item
-     * @param itemId id of the item
-     * @return the width value
-     */
-    String getSelectedItemWidthValue(String itemId){
-        return getItemDetails(itemId).getItemWidthValue();
-    }
 }

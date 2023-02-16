@@ -19,9 +19,10 @@
 
 package icrfgenerator.edc.edc.edcrunsettings.castor;
 
-import icrfgenerator.edc.edc.CastorEDC;
 import icrfgenerator.edc.edc.EDC;
 import icrfgenerator.settings.runsettings.RunSettings;
+
+import java.util.List;
 
 /**
  * Castor specific runsettings
@@ -30,9 +31,6 @@ public class CastorRunSettings extends RunSettings {
     public CastorRunSettings(EDC edc){
         super(edc);
     }
-//    public CastorRunSettings(String type){
-//        super(new CastorEDC(type));
-//    }
 
     /**
      * add an EDC specific container to store items for this EDC
@@ -59,7 +57,10 @@ public class CastorRunSettings extends RunSettings {
      * @param fieldType the new field type
      */
     public void updateItemFieldType(String key, String itemId, String fieldType){
-        getSelectedItems(key).updateItemFieldType(itemId,fieldType);
+        List<String> allKeys = RunSettings.getInstance().getAllLanguageKeysForMainKey(key);
+        allKeys.forEach(t->
+            getSelectedItems(t).updateItemFieldType(itemId,fieldType)
+        );
     }
 
     /**
@@ -73,82 +74,25 @@ public class CastorRunSettings extends RunSettings {
     }
 
     /**
-     * update the min value
-     * @param key codebook+version+language
-     * @param itemId item to update
-     * @param minValue the new min value
-     */
-    public void updateItemMinValue(String key, String itemId, String minValue){
-        getSelectedItems(key).updateItemMinValue(itemId,minValue);
-    }
-
-    /**
-     * update the max value
-     * @param key codebook+version+language
-     * @param itemId item to update
-     * @param maxValue the new max value
-     */
-    public void updateItemMaxValue(String key, String itemId, String maxValue){
-        getSelectedItems(key).updateItemMaxValue(itemId,maxValue);
-    }
-
-    /**
-     * returns the item's min value
-     * @param key codebook+version+language
-     * @param itemId item to update
-     * @return the item's min value
-     */
-    public String getSelectedItemMinValue(String key, String itemId){
-        return getSelectedItems(key).getSelectedItemMinValue(itemId);
-    }
-
-    /**
-     * returns the item's max value
-     * @param key codebook+version+language
-     * @param itemId item to update
-     * @return the item's max value
-     */
-    public String getSelectedItemMaxValue(String key, String itemId){
-        return getSelectedItems(key).getSelectedItemMaxValue(itemId);
-    }
-
-    /**
      * update the required value
      * @param key codebook+version+language
      * @param itemId item to update
-     * @param required the new required value
+     * @param value the new enforce decimals value
      */
-    public void updateItemRequiredValue(String key, String itemId, boolean required){
-        getSelectedItems(key).updateItemRequiredValue(itemId,required);
+    public void updateItemEnforceDecimalsValue(String key, String itemId, boolean value){
+        List<String> allKeys = RunSettings.getInstance().getAllLanguageKeysForMainKey(key);
+        allKeys.forEach(t->
+            getSelectedItems(t).updateItemEnforceDecimalsValue(itemId,value)
+        );
     }
 
     /**
-     * update the width value
+     * returns the item's enforce decimals value
      * @param key codebook+version+language
      * @param itemId item to update
-     * @param widthValue the new width value
+     * @return the item's enforce decimals value
      */
-    public void updateItemWidthValue(String key, String itemId, String widthValue){
-        getSelectedItems(key).updateItemWidthValue(itemId,widthValue);
-    }
-
-    /**
-     * returns the item's required value
-     * @param key codebook+version+language
-     * @param itemId item to update
-     * @return the item's required value
-     */
-    public boolean getSelectedItemRequiredValue(String key, String itemId){
-        return getSelectedItems(key).getSelectedItemRequiredValue(itemId);
-    }
-
-    /**
-     * returns the item's width value
-     * @param key codebook+version+language
-     * @param itemId item to update
-     * @return the item's width value
-     */
-    public String getSelectedItemWidthValue(String key, String itemId){
-        return getSelectedItems(key).getSelectedItemWidthValue(itemId);
+    public boolean getSelectedItemEnforceDecimalsValue(String key, String itemId){
+        return getSelectedItems(key).getSelectedItemEnforceDecimalsValue(itemId);
     }
 }

@@ -17,18 +17,21 @@
  * along with iCRFGenerator. If not, see <http://www.gnu.org/licenses/>
  */
 
-package icrfgenerator.gui.wizard.page3;
+package icrfgenerator.gui.wizard.selectitems;
 
 import icrfgenerator.codebook.CodebookItem;
 import icrfgenerator.codebook.CodebookManager;
-import icrfgenerator.codebook.CodebookStructureNode;
+//import icrfgenerator.codebook.artdecor.CodebookItem;
+import icrfgenerator.codebook.shared.CodebookStructureNode;
+import icrfgenerator.types.NodeType;
 import icrfgenerator.edc.edc.edcspecificpane.EDCSpecificPane;
 import icrfgenerator.gui.i18n.I18N;
 import icrfgenerator.settings.runsettings.RunSettings;
 import icrfgenerator.utils.GUIUtils;
-import icrfgenerator.utils.GeneralUtils;
+import icrfgenerator.utils.KeyUtils;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
+import javafx.beans.property.BooleanProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableSet;
 import javafx.css.PseudoClass;
@@ -36,7 +39,6 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.CheckBoxTreeCell;
 import javafx.scene.layout.*;
 import org.controlsfx.control.CheckTreeView;
 
@@ -47,22 +49,22 @@ import java.util.Set;
  * class which represents a tab for a single codebook language
  */
 class LanguageTab extends Tab{
-    private String key;
-    private Page3 page3;
-    private StateTracker stateTracker = new StateTracker();
-    private ObservableSet<CheckBoxTreeItem<CodebookItem>> searchMatches = FXCollections.observableSet(new HashSet<>());
+    private final String key;
+    private final SelectItemsPage selectItemsPage;
+    private final StateTracker stateTracker = new StateTracker();
+    private final ObservableSet<CheckBoxTreeItem<CodebookItem>> searchMatches = FXCollections.observableSet(new HashSet<>());
 
     /**
      * constructor for a new language tab
      * @param codebook  name of the codebook
      * @param datasetId id of the codebook dataset
-     * @param language  language of the codebook
-     * @param page3     reference to the page
+     * @param simpleLanguage  language of the codebook
+     * @param selectItemsPage     reference to the page
      */
-    LanguageTab(String codebook, String datasetId, String language, Page3 page3){
-        super(language);
-        this.page3 = page3;
-        key = GeneralUtils.getCodebookItemsMapKey(codebook, datasetId, language);
+    LanguageTab(String codebook, String datasetId, String simpleLanguage, SelectItemsPage selectItemsPage, String title){
+        super(title);
+        this.selectItemsPage = selectItemsPage;
+        key = KeyUtils.getSimpleLanguageKey(codebook, datasetId, simpleLanguage);
         setId(key);
         setClosable(false);
         setupLanguageTabContent();
@@ -76,7 +78,10 @@ class LanguageTab extends Tab{
      * - a different item
      */
     void updatePropertiesDialogWindow(){
-        PropertiesDialog.updateWindow(stateTracker.getStateCodebookItem());
+        CodebookItem codebookItem = stateTracker.getStateCodebookItem();
+        if(codebookItem!=null) {
+            PropertiesDialog.updateWindow(codebookItem);
+        }
     }
 
     /**
@@ -95,12 +100,11 @@ class LanguageTab extends Tab{
         borderPane.setLeft(leftSidePane);
 
         // make sure the borderpane takes all space available to it
-        borderPane.setPrefWidth(page3.getPrefWidth());
+        borderPane.setPrefWidth(selectItemsPage.getPrefWidth());
 
         // add the borderpane to the language tab
         setContent(borderPane);
     }
-
 
     /**
      * create the content for the left side of the borderpane
@@ -135,7 +139,7 @@ class LanguageTab extends Tab{
         gridPane.setPrefWidth(250);
         gridPane.setPadding(new Insets(10,0,0,0));
         gridPane.setVgap(1);
-        gridPane.setPrefHeight(page3.getPrefHeight());
+        gridPane.setPrefHeight(selectItemsPage.getPrefHeight());
 
         // add the first row - the search textfield and the search button
         gridPane.add(searchTextField, 0, 0);
@@ -234,11 +238,12 @@ class LanguageTab extends Tab{
     private CheckTreeView<CodebookItem> createItemTree(EDCSpecificPane edcSpecificPane){
         // get a graphical tree representation
         CheckTreeView<CodebookItem> checkTreeView = new SearchableTreeView(CodebookManager.getInstance().getCodebookTree(key));
-        checkTreeView.setPrefHeight(page3.getPrefHeight());
+        checkTreeView.setPrefHeight(selectItemsPage.getPrefHeight());
 
         // add listeners
         addTreeItemListener((CheckBoxTreeItem<CodebookItem>)checkTreeView.getRoot(), checkTreeView, edcSpecificPane);
         addTreeListener(checkTreeView, edcSpecificPane);
+
         return checkTreeView;
     }
 
@@ -252,13 +257,15 @@ class LanguageTab extends Tab{
                 .selectedItemProperty()
                 .addListener((observable, oldValue, newValue) -> {
                     if(newValue!=null) {
-                        // if we're dealing with a leaf, adjust the right side pane to show the details of this item
-                        if (newValue.isLeaf()) {
-                            stateTracker.highlightAction(newValue.getValue(), key, edcSpecificPane, ((CheckBoxTreeItem) newValue).isSelected());
+                        NodeType nodeType = newValue.getValue().getNodeType();
+                        if(nodeType.equals(NodeType.GROUPITEM)){
+                            stateTracker.showInfoGroup(newValue.getValue(), key, edcSpecificPane);
                         }
-                        // otherwise we show some information, stating that a leaf node should be selected
-                        else {
-                            stateTracker.highlightNonLeafNode(newValue.getValue(), edcSpecificPane);
+                        else if (nodeType.equals(NodeType.LEAFINFOITEM)){
+                            stateTracker.showInfoLeaf(newValue.getValue(), key, edcSpecificPane);
+                        }
+                        else{
+                            stateTracker.showItem(newValue.getValue(), key, edcSpecificPane);
                         }
                         // update the Properties Dialog to reflect the newly selected item
                         updatePropertiesDialogWindow();
@@ -273,33 +280,22 @@ class LanguageTab extends Tab{
      * @param edcSpecificPane the right side pane
      */
     private void addTreeItemListener(CheckBoxTreeItem<CodebookItem> checkBoxTreeItem, CheckTreeView<CodebookItem> checkTreeView, EDCSpecificPane edcSpecificPane){
-        // add the listener to the checkbox
-        checkBoxTreeItem.selectedProperty().addListener((observable, oldValue, newValue) -> {
-
-            // check whether we're in a leaf
-            if (checkBoxTreeItem.isLeaf()) {
-                // update the right side pane for selecting / deselecting an item
-                if (newValue) {
-                    stateTracker.selectAction(checkBoxTreeItem.getValue(), key, edcSpecificPane);
-                } else {
-                    stateTracker.deSelectAction(checkBoxTreeItem.getValue(), key, edcSpecificPane);
+            checkBoxTreeItem.selectedProperty().addListener((observable, oldValue, newValue) -> {
+                if(newValue){
+                    stateTracker.selectItem(checkBoxTreeItem.getValue(), key, edcSpecificPane);
                 }
-            }
-
-            // when selecting a checkbox, first highlight the row in the tree to prevent confusion
-            checkTreeView.getSelectionModel().select(checkBoxTreeItem);
-
-            // check whether the user is allowed to proceed to to the next page
-            page3.checkMayProceed();
-        });
+                else{
+                    stateTracker.deselectItem(checkBoxTreeItem.getValue(), key, edcSpecificPane);
+                }
+                // check whether the user is allowed to proceed to the next page
+                selectItemsPage.checkMayProceed();
+            });
 
         // get the children and add listeners to them as well
         for(TreeItem<CodebookItem> child:checkBoxTreeItem.getChildren()){
             addTreeItemListener((CheckBoxTreeItem<CodebookItem>)child, checkTreeView, edcSpecificPane);
         }
     }
-
-
 
     /**
      * inner class for searchable tree representation
@@ -325,7 +321,7 @@ class LanguageTab extends Tab{
             rootNode.setExpanded(true);
             // set the cell factory of our view to the SearchHighlightingTreeCell to allow for our
             // custom styling for searching items
-            setCellFactory(tv -> new SearchHighlightingTreeCell());
+            setCellFactory(tv -> new MyCell(this));
         }
 
         /**
@@ -348,16 +344,22 @@ class LanguageTab extends Tab{
 
         /**
          *  customised checkbox tree cells that allow for highlighting
-         *  based on https://stackoverflow.com/questions/34914058/javafx-how-to-highlight-certain-items-in-a-treeview
+         *  based on <a href="https://stackoverflow.com/questions/34914058/javafx-how-to-highlight-certain-items-in-a-treeview">...</a>
          *  due to it being an inner class instead of a static nested class , we can directly access the searchMatches
          *  defined in the top class
          */
-        final class SearchHighlightingTreeCell extends CheckBoxTreeCell<CodebookItem> {
+        class MyCell extends TreeCell<CodebookItem> {
 
-            // keep reference to binding to prevent premature garbage collection:
+            private final CheckBox checkBox = new CheckBox();
+
+            private BooleanProperty currentSelectedBinding;
+
+            // only need this if you are using the indeterminateProperty() of your
+            // CheckBoxTreeItems
+            private BooleanProperty currentIndeterminateBinding ;
             private BooleanBinding booleanBinding;
 
-            SearchHighlightingTreeCell() {
+            public MyCell(CheckTreeView<CodebookItem> checkTreeView) {
                 // define a specific style for a different state
                 PseudoClass searchMatch = PseudoClass.getPseudoClass("search-match");
 
@@ -377,6 +379,41 @@ class LanguageTab extends Tab{
                 booleanBinding.addListener((observable, oldValue, newValue) ->
                         pseudoClassStateChanged(searchMatch, newValue)
                 );
+
+
+                // add extra event handling to the checkbox
+                checkBox.setOnMousePressed(event -> {
+                    TreeItem<CodebookItem> treeItem = ((MyCell)checkBox.getParent()).getTreeItem();
+                    CodebookItem codebookItem = treeItem.getValue();
+                    stateTracker.setTriggerCodebookItem(codebookItem);
+                    checkTreeView.getSelectionModel().select(treeItem);
+                });
+            }
+
+            @Override
+            protected void updateItem(CodebookItem item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty) {
+                    setText(null);
+                    setGraphic(null);
+                } else {
+                    setText(item.getItemName());
+                    setGraphic(checkBox);
+                    if (currentSelectedBinding != null) {
+                        checkBox.selectedProperty().unbindBidirectional(currentSelectedBinding);
+                    }
+                    if (currentIndeterminateBinding != null) {
+                        checkBox.indeterminateProperty().unbindBidirectional(currentIndeterminateBinding);
+                    }
+                    if (getTreeItem() instanceof CheckBoxTreeItem) {
+                        CheckBoxTreeItem<?> cbti = (CheckBoxTreeItem<?>) getTreeItem();
+                        currentSelectedBinding = cbti.selectedProperty();
+                        checkBox.selectedProperty().bindBidirectional(currentSelectedBinding);
+                        currentIndeterminateBinding = cbti.indeterminateProperty();
+                        checkBox.indeterminateProperty().bindBidirectional(currentIndeterminateBinding);
+                    }
+                }
             }
         }
     }

@@ -20,6 +20,7 @@
 package icrfgenerator.edc;
 
 import icrfgenerator.edc.edc.EMXEDC;
+import icrfgenerator.edc.edc.ODMEDC;
 import icrfgenerator.edc.edc.OpenClinica3EDC;
 import icrfgenerator.edc.edc.REDCapEDC;
 import icrfgenerator.edc.edc.castorformtypes.CastorEDCReport;
@@ -27,6 +28,7 @@ import icrfgenerator.edc.edc.castorformtypes.CastorEDCStep;
 import icrfgenerator.edc.edc.castorformtypes.CastorEDCSurvey;
 import icrfgenerator.edc.edc.edcrunsettings.castor.CastorRunSettings;
 import icrfgenerator.edc.edc.edcrunsettings.emx.EMXRunSettings;
+import icrfgenerator.edc.edc.edcrunsettings.odm.ODMRunSettings;
 import icrfgenerator.edc.edc.edcrunsettings.openclinica3.OpenClinica3RunSettings;
 import icrfgenerator.edc.edc.edcrunsettings.redcap.REDCapRunSettings;
 
@@ -35,26 +37,15 @@ import icrfgenerator.edc.edc.edcrunsettings.redcap.REDCapRunSettings;
  */
 public class EDCFactory {
     public static void generateEDC(String value){
-        switch (value){
-            case "OpenClinica 3":
-                new OpenClinica3RunSettings(new OpenClinica3EDC());
-                break;
-            case "REDCap":
-                new REDCapRunSettings(new REDCapEDC());
-                break;
-            case "Castor - Step":
-                new CastorRunSettings(new CastorEDCStep());
-                break;
-            case "Castor - Report":
-                new CastorRunSettings(new CastorEDCReport());
-                break;
-            case "Castor - Survey":
-                new CastorRunSettings(new CastorEDCSurvey());
-                break;
-            case "Molgenis EMX":
-                new EMXRunSettings(new EMXEDC());
-                break;
-            default: System.err.println("not found: "+value);
+        switch (value) {
+            case "LibreClinica / OpenClinica 3" -> new OpenClinica3RunSettings(new OpenClinica3EDC());
+            case "REDCap" -> new REDCapRunSettings(new REDCapEDC());
+            case "Castor - Step" -> new CastorRunSettings(new CastorEDCStep());
+            case "Castor - Report" -> new CastorRunSettings(new CastorEDCReport());
+            case "Castor - Survey" -> new CastorRunSettings(new CastorEDCSurvey());
+            case "ODM-XML" -> new ODMRunSettings(new ODMEDC());
+            case "Molgenis EMX" -> new EMXRunSettings(new EMXEDC());
+            default -> System.err.println("not found: " + value);
         }
     }
 }

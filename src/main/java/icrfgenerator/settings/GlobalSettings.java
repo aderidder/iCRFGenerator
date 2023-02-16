@@ -20,6 +20,9 @@
 package icrfgenerator.settings;
 
 import icrfgenerator.resourcemanagement.ResourceManager;
+import icrfgenerator.types.OperatorType;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -27,25 +30,23 @@ import java.nio.file.Paths;
 import java.util.*;
 
 /**
+ * makes sure the iCRFSettings file exists
  * stores some global settings
  */
 public class GlobalSettings {
-//    public static String server = "http://decor.nictiz.nl/services/";
-
     private static final String cacheDirName = "."+File.separator+"cache";
-    private static final String codebookFileName = "codebooks.txt";
+    private static final String icrfSettingsFilename = "iCRFSettings.xlsx";
 
-    private static final List<String> edcList = Arrays.asList("REDCap", "OpenClinica 3", "Castor - Step", "Castor - Report", "Castor - Survey", "Molgenis EMX");
+    private static final List<String> edcList = Arrays.asList("REDCap", "LibreClinica / OpenClinica 3", "Castor - Step", "Castor - Report", "Castor - Survey", "ODM-XML", "Molgenis EMX");
     private static final List<String> uiLanguages = Arrays.asList("en", "nl");
 
     // timeout settings; 5000 is 5 seconds.
-    private static final int metaDataConnectionTimeout = 5000;
-    private static final int metaDataReadTimeout = 15000;
-    private static final int codebookConnectionTimeout = 5000;
+    private static final int metaDataConnectionTimeout = 15000;
+    private static final int metaDataReadTimeout = 30000;
+    private static final int codebookConnectionTimeout = 15000;
     private static int codebookReadTimeout = 120000;
 
-    private static final List<String> lowQualityCodebookLanguageCombinations = new ArrayList<>();
-    private static final Map<String, Source> codebookNameToSourceMap = new TreeMap<>();
+    private static final Map<String, String> serverToOnlineURL = new HashMap<>();
 
     /**
      * setup:
@@ -54,16 +55,11 @@ public class GlobalSettings {
      * - read the codebooks.txt file
      */
     static {
-        setup();
-    }
-
-    /**
-     * setup
-     */
-    private static void setup(){
         setupCacheDir();
-        setupCodebookFile();
-        readCodebookFile();
+        readiCRFSettingsFile();
+        serverToOnlineURL.put("https://ckm.openehr.org/ckm/", "https://ckm.openehr.org/ckm/archetypes/");
+        serverToOnlineURL.put("https://decor.nictiz.nl/services/", "https://decor.nictiz.nl/art-decor/decor-project--");
+
     }
 
     /**
@@ -77,57 +73,54 @@ public class GlobalSettings {
     }
 
     /**
-     * copy the default codebooks file it no codebookfile exists
+     * if there is no iCRFSettings file in the cache dir, copy the defaultiCRFSettings file there
+     * @param file the file we're looking for
+     * @throws IOException issue copying file
      */
-    private static void setupCodebookFile(){
-        File codebookFile = new File(cacheDirName+File.separator+codebookFileName);
-        if(!codebookFile.exists()){
-            InputStream inputStream = ResourceManager.getResourceAsStream("/defaultCodebooks.txt");
-            try {
-                Files.copy(inputStream, Paths.get(codebookFile.getPath()));
-            } catch (IOException ex) {
-                throw new RuntimeException("Fatal error: Something went wrong while attempting to copy the default " +
-                        "codebooks file.");
-            }
+    private static void copyFileToCacheDir(File file) throws IOException {
+        if(!file.exists()){
+            InputStream inputStream = ResourceManager.getResourceAsStream("/default"+file.getName());
+            Files.copy(inputStream, Paths.get(file.getPath()));
         }
     }
 
     /**
-     * read the codebooks file
-     * a codebook file contains the following tab-separated values:
-     * Required:
-     * - name
-     * - prefix
-     * - server
-     * - whether a group itself should be considered an item
-     *
-     * Optional:
-     * - language to ignore (e.g. en-US). In case of multiple languages, these are comma-separated
+     * read the iCRFSettings file
      */
-    private static void readCodebookFile(){
-        try(BufferedReader bufferedReader = new BufferedReader(new FileReader(cacheDirName+File.separator+codebookFileName))){
-            String line = bufferedReader.readLine();
-            while(line != null) {
-                // split the line, based on tabs. Multiple tabs are seen as one
-                String[] splitLine = line.trim().split("\t+");
-                // ignore a line if it starts with a # or if the length is too short
-                if(!line.startsWith("#") && splitLine.length>2) {
-                    // add the entry to the map.
-                    codebookNameToSourceMap.put(splitLine[0], new Source(splitLine[1], splitLine[2], Boolean.valueOf(splitLine[3])));
-                    // check whether there are languages which should be ignored
-                    if(splitLine.length==5){
-                        // check for multiple languages (comma separated)
-                        String[] skipLanguages = splitLine[4].split(",");
-                        for(String skipLanguage:skipLanguages){
-                            lowQualityCodebookLanguageCombinations.add(splitLine[0]+"_"+skipLanguage.trim());
-                        }
-                    }
-                }
-                line = bufferedReader.readLine();
-            }
+    private static void readiCRFSettingsFile(){
+        File settingsFilename = new File(cacheDirName+File.separator+icrfSettingsFilename);
+        try{
+            copyFileToCacheDir(settingsFilename);
+            readiCRFSettingsFile(settingsFilename);
         } catch (IOException e) {
-            throw new RuntimeException("Fatal error: something is wrong with the codebooks.txt file.");
+            throw new RuntimeException("Fatal error: Something went wrong while attempting to copy the default " +
+                    "messages file.");
         }
+    }
+
+    /**
+     * Opens the iCRFSettings Excel file and parses it
+     * @param file the file
+     */
+    public static void readiCRFSettingsFile(File file) {
+        try {
+            Workbook workbook = WorkbookFactory.create(file);
+            CodebookInfo.readCodebooks(workbook.getSheet("Codebooks"));
+            OperatorType.readValidationMessages(workbook.getSheet("ValidationMessages"));
+            LanguageHelper.readLanguageSheet(workbook.getSheet("Languages"));
+            workbook.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * returns a String which can be used to go to the codebook online
+     * @param codebook name of the codebook
+     * @return a String which can be used to go to the codebook online
+     */
+    public static String getOnlineURLString(String codebook){
+        return serverToOnlineURL.get(getServer(codebook))+getCodebookPrefix(codebook);
     }
 
     /**
@@ -159,7 +152,51 @@ public class GlobalSettings {
      * @return a list of the known codebook names
      */
     public static List<String> getCodebookNames() {
-        return new ArrayList<>(codebookNameToSourceMap.keySet());
+        return CodebookInfo.getCodebookNames();
+    }
+
+    /**
+     * returns the codebook's source
+     * @param codebookName name of the codebook
+     * @return the codebook's source
+     */
+    public static String getSource(String codebookName){
+        return CodebookInfo.getSource(codebookName);
+    }
+
+    /**
+     * returns a list with codebooks filtered by their source
+     * @param sources the sources to filter by
+     * @return a list with codebook names
+     */
+    public static List<String> getCodebookNamesFilteredBySource(List<String> sources){
+        return CodebookInfo.getCodebookNamesFilteredBySource(sources);
+    }
+
+    /**
+     * returns a list with codebooks filted by tags - only codebooks that have all tags are returned
+     * @param tags list with tags
+     * @return a list with codebook names
+     */
+    public static List<String> getCodebookNamesFilteredByTagAll(List<String> tags){
+        return CodebookInfo.getCodebookNamesFilteredByTagAll(tags);
+    }
+
+    /**
+     * returns a list with codebooks filted by tags - codebooks that have any of the tags are returned
+     * @param tags list with tags
+     * @return a list with codebook names
+     */
+    public static List<String> getCodebookNamesFilteredByTagAny(List<String> tags){
+        return CodebookInfo.getCodebookNamesFilteredByTagAny(tags);
+    }
+
+    /**
+     * returns a list with all tags
+     * @return a list with all tags
+     */
+    public static List<String> getTags(){
+        return CodebookInfo.getTags();
     }
 
     /**
@@ -168,7 +205,7 @@ public class GlobalSettings {
      * @return server on which the codebook is stored
      */
     public static String getServer(String codebookName){
-        return codebookNameToSourceMap.get(codebookName).getServer();
+        return CodebookInfo.getServer(codebookName);
     }
 
     /**
@@ -178,7 +215,7 @@ public class GlobalSettings {
      * @return true/false
      */
     public static boolean isLowQualityCodebookLanguage(String codebookName, String language){
-        return lowQualityCodebookLanguageCombinations.contains(codebookName+"_"+language);
+        return CodebookInfo.isLowQualityCodebookLanguage(codebookName, language);
     }
 
     /**
@@ -187,7 +224,7 @@ public class GlobalSettings {
      * @return  prefix of the codebook
      */
     public static String getCodebookPrefix(String codebookName){
-        return codebookNameToSourceMap.get(codebookName).getPrefix();
+        return CodebookInfo.getCodebookPrefix(codebookName);
     }
 
     /**
@@ -197,7 +234,7 @@ public class GlobalSettings {
      * @return whether group should be considered an item
      */
     public static boolean groupIsAnItem(String codebookName){
-        return codebookNameToSourceMap.get(codebookName).isGroupIsAnItem();
+        return CodebookInfo.groupIsAnItem(codebookName);
     }
 
     /**
@@ -232,34 +269,11 @@ public class GlobalSettings {
         return codebookReadTimeout;
     }
 
+    /**
+     * sets the codebook read timeout
+     * @param codebookReadTimeout value (ms), which is multiplied by 1000 to get to seconds
+     */
     public static void setCodebookReadTimeout(int codebookReadTimeout){
         GlobalSettings.codebookReadTimeout = codebookReadTimeout*1000;
-    }
-}
-
-/**
- * Defintion of a codebook; stores its prefix and whether a non-leaf node should be considered an item or not
- */
-class Source{
-    private String server;
-    private String prefix;
-    private boolean groupIsAnItem;
-
-    Source(String prefix, String server, boolean groupIsAnItem){
-        this.prefix = prefix;
-        this.groupIsAnItem = groupIsAnItem;
-        this.server = server;
-    }
-
-    String getServer(){
-        return server;
-    }
-
-    String getPrefix() {
-        return prefix;
-    }
-
-    boolean isGroupIsAnItem() {
-        return groupIsAnItem;
     }
 }

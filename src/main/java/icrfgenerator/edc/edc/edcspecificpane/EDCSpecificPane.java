@@ -30,21 +30,54 @@ public interface EDCSpecificPane {
      */
     Pane getPane();
 
-//    void highlightingOnly(String key, CodebookItem codebookItem);
-    void highlightingSelecting(String key, CodebookItem codebookItem);
-    void highlightingDeselecting(String key, CodebookItem codebookItem);
-    void highlightingSelected(String key, CodebookItem stateCodebookItem);
-    void highlightingDeselected(String key, CodebookItem stateCodebookItem);
-
-//    void highlightedOnly(String key, CodebookItem codebookItem);
-    void highlightedSelecting(String key, CodebookItem codebookItem);
-    void highlightedDeselecting(String key, CodebookItem codebookItem);
-//    void highlightedSelected(String key, CodebookItem stateCodebookItem);
-//    void highlightedDeselected(String key, CodebookItem stateCodebookItem);
+    /**
+     * If the item is a group item, set the borderpane to show a message
+     * @param key codebook + datasetId + language
+     * @param codebookItem item for which to build the pane
+     */
+    void showInfoGroup(String key, CodebookItem codebookItem);
 
     /**
-     * behaviour when a non-leaf node is highlighted
+     * If the item is an info leaf (no real content), set the borderpane to show a message
+     * @param key codebook + datasetId + language
+     * @param codebookItem item for which to build the pane
      */
-    void setInfoPane();
+    void showInfoLeaf(String key, CodebookItem codebookItem);
+
+    /**
+     * Show the item with either enabled fields and values or disabled fields
+     * @param key codebook + datasetId + language
+     * @param codebookItem item for which to build the pane
+     */
+    void showItem(String key, CodebookItem codebookItem);
+
+    /**
+     * Select the item
+     * @param key codebook + datasetId + language
+     * @param codebookItem item selected
+     */
+    void singleSelectItem(String key, CodebookItem codebookItem);
+
+    /**
+     * deselect a single item
+     * @param key codebook + datasetId + language
+     * @param codebookItem item deselected
+     */
+    void singleDeselectItem(String key, CodebookItem codebookItem);
+
+    /**
+     * select an item due to a group-select
+     * @param key codebook + datasetId + language
+     * @param codebookItem item selected
+     */
+    void groupSelectItem(String key, CodebookItem codebookItem);
+
+    /**
+     * deselect an item due to a group-select
+     * @param key codebook + datasetId + language
+     * @param codebookItem item deselected
+     */
+    void groupDeselectItem(String key, CodebookItem codebookItem);
+
 
 }

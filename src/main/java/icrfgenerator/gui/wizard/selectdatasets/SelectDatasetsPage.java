@@ -17,7 +17,7 @@
  * along with iCRFGenerator. If not, see <http://www.gnu.org/licenses/>
  */
 
-package icrfgenerator.gui.wizard.page2;
+package icrfgenerator.gui.wizard.selectdatasets;
 
 import icrfgenerator.codebook.CodebookManager;
 import icrfgenerator.gui.MainWindow;
@@ -27,30 +27,32 @@ import icrfgenerator.settings.runsettings.RunSettings;
 import icrfgenerator.utils.GUIUtils;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
-import javafx.collections.ListChangeListener;
 import javafx.concurrent.Task;
+import javafx.geometry.Insets;
 import javafx.scene.control.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.controlsfx.control.CheckComboBox;
 import org.controlsfx.dialog.Wizard;
 import org.controlsfx.dialog.WizardPane;
 
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Page2 extends WizardPane {
+public class SelectDatasetsPage extends WizardPane {
     private static final Logger logger = LogManager.getLogger(MainWindow.class.getName());
+    private static final Map<String, Tab> tabMap = new HashMap<>();
     private static RunSettings runSettings;
-    private static Map<String, Tab> tabMap = new HashMap<>();
 
-    private CodebookManager codebookManager = CodebookManager.getInstance();
+    private final CodebookManager codebookManager = CodebookManager.getInstance();
+    private final Label overlappingLanguagesLabel = new Label("Overlapping languages: ");
 
     // boolean property which we use to check whether we can proceed to the next page
-    private static BooleanProperty mayNotProceed = new SimpleBooleanProperty();
+    private static final BooleanProperty mayNotProceed = new SimpleBooleanProperty();
 
     /**
      * reset page statics
@@ -60,25 +62,12 @@ public class Page2 extends WizardPane {
         runSettings = RunSettings.getInstance();
     }
 
-    public Page2(int wizardWidth, int wizardHeight){
-        this.setId("Page2");
+    public SelectDatasetsPage(int wizardWidth, int wizardHeight){
+        this.setId("SelectDatasets");
         this.getStylesheets().clear();
         this.setPrefWidth(wizardWidth);
         this.setPrefHeight(wizardHeight);
         this.getStylesheets().add(ResourceManager.getResourceStyleSheet("style2.css"));
-    }
-
-
-    /**
-     * retrieves an existing tab or creates a new one if one doesn't exist
-     * @param codebook name of the codebook
-     * @return a tab for the codebook
-     */
-    private Tab getTab (String codebook){
-        if(!tabMap.containsKey(codebook)){
-            tabMap.put(codebook, createNewTab(codebook));
-        }
-        return tabMap.get(codebook);
     }
 
     /**
@@ -118,7 +107,7 @@ public class Page2 extends WizardPane {
      * show a pane with an error message when loading fails due to e.g. a timeout
      */
     private void setFailedLoadingContent(){
-        this.setContent(GUIUtils.createErrorPane(I18N.getLanguageText("page2ErrorPane")));
+        this.setContent(GUIUtils.createErrorPane(I18N.getLanguageText("pageSelectDatasetsErrorPane")));
         showButtons();
         checkMayProceed();
     }
@@ -134,31 +123,35 @@ public class Page2 extends WizardPane {
 
         // retrieve existing tab / create a new tab for each selected codebook
         for(String codebook:selectedCodebooks){
-            Tab tab = getTab(codebook);
+            Tab tab = createNewTab(codebook);
             newTabPane.getTabs().add(tab);
             // something weird happening with the redraw when reentering the page. Apparently I can prevent this
             // by selecting the tab
             newTabPane.getSelectionModel().select(tab);
         }
+        BorderPane borderPane = new BorderPane();
+        borderPane.setCenter(newTabPane);
+
+        updateOverlappingLanguagesLabel();
+        borderPane.setBottom(overlappingLanguagesLabel);
         // set the content
-        this.setContent(newTabPane);
+        this.setContent(borderPane);
 
         // select the first tab
         newTabPane.getSelectionModel().selectFirst();
 
         showButtons();
-        this.setHeaderText(I18N.getLanguageText("page2Title")+" "+runSettings.getEDC().getEDCName()+" CRF...");
+        this.setHeaderText(I18N.getLanguageText("pageSelectDatasetsTitle"));
 
         checkMayProceed();
     }
-
 
     /**
      * create some loading awareness for the user
      */
     private void setLoadingContent(){
-        this.setHeaderText(I18N.getLanguageText("page2LoadingPageTitle"));
-        this.setContent(GUIUtils.createLoadingPane(I18N.getLanguageText("page2LoadingTitle")));
+        this.setHeaderText(I18N.getLanguageText("pageSelectDatasetsLoadingPageTitle"));
+        this.setContent(GUIUtils.createLoadingPane(I18N.getLanguageText("pageSelectDatasetsLoadingTitle")));
     }
 
     /**
@@ -180,7 +173,10 @@ public class Page2 extends WizardPane {
     private GridPane createVersionLanguagesGridPane(String codebook){
         int rownum = 1;
         GridPane gridPane = GUIUtils.createGridPane();
+        gridPane.setPadding(new Insets(10,0,0,0));
         List<String> datasetIdentifiers = codebookManager.getDatasetIdentifiers(codebook);
+
+        List<String> codebookSelectedDatasetIds = runSettings.getCodebookSelectedDatasetIds(codebook);
 
         // for all datasets in the codebook
         for(String datasetIdentifier:datasetIdentifiers){
@@ -188,29 +184,32 @@ public class Page2 extends WizardPane {
             String datasetVersion = codebookManager.getDatasetVersion(codebook, datasetIdentifier);
             String datasetName = codebookManager.getDatasetName(codebook, datasetIdentifier);
             String datasetDate = codebookManager.getDatasetEffectiveDate(codebook, datasetIdentifier);
+            String dateString = datasetDate.equalsIgnoreCase("01-Jan-1900")?"":" ("+datasetDate+")";
 
             // create a checkbox
             CheckBox checkBox = new CheckBox();
             if(datasetName.length()>60) {
-                checkBox.setText(datasetName.substring(0,59)+"..."+" - "+datasetVersion+" ("+datasetDate+")");
+                checkBox.setText(datasetName.substring(0,59)+"..."+" - "+datasetVersion+dateString);
                 GUIUtils.addTooltip(checkBox, datasetName);
             }
             else{
-                checkBox.setText(datasetName+" - "+datasetVersion+" ("+datasetDate+")");
+                checkBox.setText(datasetName+" - "+datasetVersion+dateString);
             }
 
             checkBox.setId(datasetIdentifier);
 
-            // and a language selected combobox
-            CheckComboBox checkComboBox = createLanguageCheckComboBox(codebook, datasetIdentifier);
+            addCheckboxListener(checkBox, codebook, datasetIdentifier);
 
-            // add the listeners
-            addCheckComboBoxListener(codebook, datasetIdentifier, checkComboBox);
-            addCheckboxListener(checkBox, checkComboBox, codebook, datasetIdentifier);
+            if(codebookSelectedDatasetIds.contains(datasetIdentifier)){
+                checkBox.setSelected(true);
+            }
 
             // add them to the pane
-            gridPane.add(checkBox, 1, rownum);
-            gridPane.add(checkComboBox, 2, rownum);
+            gridPane.add(checkBox, 1, rownum, 3, 1);
+            rownum++;
+            List<String> simpleLanguagesList = codebookManager.getDatasetSimpleLanguages(codebook, datasetIdentifier);
+            Collections.sort(simpleLanguagesList);
+            gridPane.add(new Label(I18N.getLanguageText("pageSelectDatasetsLanguages")+" "+simpleLanguagesList), 3, rownum);
             rownum++;
         }
 
@@ -218,56 +217,43 @@ public class Page2 extends WizardPane {
     }
 
     /**
-     * Add listener to the codebook datasetId selection checkbox
-     * @param checkBox      codebook datasetId selection checkbox
-     * @param checkComboBox language selection checkcombobox
-     * @param codebook      name of the codebook
-     * @param datasetId       datasetId of the codebook
+     * add listener to the checkbox
+     * @param checkBox  checkbox
+     * @param codebook  codebook
+     * @param datasetId id of the dataset
      */
-    private void addCheckboxListener(CheckBox checkBox, CheckComboBox checkComboBox, String codebook, String datasetId){
+    private void addCheckboxListener(CheckBox checkBox, String codebook, String datasetId){
         checkBox.setOnAction(event -> {
             // if the codebook datasetId is selected, enable the language selection box and update the runsettings accordingly
             if(checkBox.isSelected()){
-                checkComboBox.setDisable(false);
-                runSettings.setDatasetSelectedLanguages(codebook, datasetId, checkComboBox.getCheckModel().getCheckedItems());
+                runSettings.addSelectedDataset(codebook, datasetId);
             }
             // if the codebook datasetId is selected, enable the language selection box and update the runsettings accordingly
             else{
-                checkComboBox.setDisable(true);
-                runSettings.clearDatasetSelectedLanguages(codebook, datasetId);
+                runSettings.removeSelectedDataset(codebook, datasetId);
             }
+            updateOverlappingLanguagesLabel();
             checkMayProceed();
         });
     }
 
     /**
-     * Creates a single CheckComboBox with available languages for a codebook+version.
-     * @param codebook the codebook
-     * @param datasetIdentifier identifier of a dataset
-     * @return a CheckComboBox with the languages available for this codebook
+     * retrieve the overlapping languages for the selected codebooks and update the label to provide the information
      */
-    private CheckComboBox createLanguageCheckComboBox(String codebook, String datasetIdentifier){
-        // retrieve languages and create the CheckComboBox
-        List<String> languages = codebookManager.getLanguagesForCodebookDataset(codebook, datasetIdentifier);
-        return GUIUtils.createCheckComboBox(languages);
-    }
+    private void updateOverlappingLanguagesLabel(){
+        List<String> overlappingLanguages = runSettings.getOverlappingSimpleLanguages();
+        Collections.sort(overlappingLanguages);
 
-    /**
-     * add a listener to a checkcombobox
-     * @param codebook name of the codebook
-     * @param datasetIdentifier dataset identifier
-     * @param checkComboBox the checkcombobox to which to add the listener
-     */
-    private void addCheckComboBoxListener(String codebook, String datasetIdentifier, CheckComboBox<String> checkComboBox){
-        // add a listener to the items in the CheckComboBox
-        checkComboBox.getCheckModel().getCheckedItems().addListener(
-            (ListChangeListener<String>) c -> {
-                runSettings.setDatasetSelectedLanguages(codebook, datasetIdentifier, (List<String>) c.getList());
-                checkMayProceed();
-            }
-        );
+        if(!runSettings.anyDatasetsSelected()){
+            overlappingLanguagesLabel.setText(I18N.getLanguageText("pageSelectDatasetsOverlappingLanguagesNone1"));
+        }
+        else if(overlappingLanguages.size()==0){
+            overlappingLanguagesLabel.setText(I18N.getLanguageText("pageSelectDatasetsOverlappingLanguagesNone2"));
+        }
+        else {
+            overlappingLanguagesLabel.setText(I18N.getLanguageText("pageSelectDatasetsOverlappingLanguages")+" "+ String.join(", ", overlappingLanguages));
+        }
     }
-
 
     /**
      * hide all buttons in the wizard
@@ -288,14 +274,13 @@ public class Page2 extends WizardPane {
      */
     private void checkMayProceed(){
         // the user is allowed to proceed if at least one dataset + language is selected
-        if(runSettings.oneOrMoreSelectedDatasetsAndLanguages()){
+        if(runSettings.anyDatasetsSelected() && runSettings.getOverlappingSimpleLanguages().size()>0){
             mayNotProceed.setValue(false);
         }
         else{
             mayNotProceed.setValue(true);
         }
     }
-
 
     /**
      * things to do when we enter the page

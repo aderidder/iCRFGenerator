@@ -26,10 +26,7 @@ import icrfgenerator.settings.runsettings.ItemDetails;
  */
 class CastorItemDetails extends ItemDetails {
     private String fieldType;
-    private String minValue="";
-    private String maxValue="";
-    private String width="";
-    private boolean required;
+    private boolean enforceDecimals;
 
     /**
      * constructor
@@ -57,66 +54,19 @@ class CastorItemDetails extends ItemDetails {
     }
 
     /**
-     * set the minvalue for this item
-     * @param minValue the min value
-     */
-    void setItemMinValue(String minValue){
-        this.minValue = minValue;
-    }
-
-    /**
-     * set the max value for this item
-     * @param maxValue the max value
-     */
-    void setItemMaxValue(String maxValue){
-        this.maxValue = maxValue;
-    }
-
-    /**
-     * get the item's min value
-     * @return the item's min value
-     */
-    String getItemMinValue(){
-        return minValue;
-    }
-
-    /**
-     * get the item's max value
-     * @return the item's max value
-     */
-    String getItemMaxValue(){
-        return maxValue;
-    }
-
-    /**
      * set the item's required value
-     * @param required the item's required value
+     * @param enforceDecimals the item's required value
      */
-    void setItemRequiredValue(boolean required){
-        this.required=required;
+    void setItemEnforceDecimalsValue(boolean enforceDecimals){
+        this.enforceDecimals=enforceDecimals;
     }
 
     /**
-     * set the item's width value
-     * @param width the item's width value
+     * get the item's enforce decimals value
+     * @return the item's enforce decimals value
      */
-    void setItemWidthValue(String width){
-        this.width = width;
+    boolean getItemEnforceDecimalsValue(){
+        return enforceDecimals;
     }
 
-    /**
-     * get the item's required value
-     * @return the item's required value
-     */
-    boolean getItemRequiredValue(){
-        return required;
-    }
-
-    /**
-     * get the item's width value
-     * @return the item's width value
-     */
-    String getItemWidthValue(){
-        return width;
-    }
 }

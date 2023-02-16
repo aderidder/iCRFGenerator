@@ -17,17 +17,21 @@
  * along with iCRFGenerator. If not, see <http://www.gnu.org/licenses/>
  */
 
-package icrfgenerator.utils;
+package icrfgenerator.edc.edc.edcrunsettings.odm;
 
-public class GeneralUtils {
+import icrfgenerator.settings.runsettings.ItemDetails;
+
+/**
+ * ODM specific item details
+ */
+class ODMItemDetails extends ItemDetails {
     /**
-     * creates the key.
-     * @param codebookName name of codebook
-     * @param datasetId datasetId of codebook
-     * @param language language of codebook
-     * @return codebook+datasetId+language
+     * constructor
+     * @param key codebook + datasetid + language
+     * @param itemId id of the item
      */
-    public static String getCodebookItemsMapKey(String codebookName, String datasetId, String language){
-        return codebookName+datasetId+language;
+    ODMItemDetails(String key, String itemId){
+        super(key, itemId);
     }
+
 }

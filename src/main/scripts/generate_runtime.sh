@@ -16,5 +16,5 @@
 # You should have received a copy of the GNU General Public License
 # along with iCRFGenerator. If not, see <http://www.gnu.org/licenses/>
 
-$1/jlink --module-path=$2 --add-modules=java.base,java.desktop,java.management,java.naming,java.rmi,java.scripting,java.sql,java.xml.crypto,javafx.media,javafx.web,jdk.javadoc --no-man-pages --compress 2 --no-header-files --strip-debug --output $3/java-runtime
+$1/jlink --module-path=$2 --add-modules=java.base,java.desktop,java.management,java.naming,java.rmi,java.scripting,java.sql,java.xml.crypto,javafx.media,javafx.web,jdk.javadoc,jdk.crypto.cryptoki --no-man-pages --compress 2 --no-header-files --strip-debug --output $3/java-runtime
 cp $4/runme.command $3

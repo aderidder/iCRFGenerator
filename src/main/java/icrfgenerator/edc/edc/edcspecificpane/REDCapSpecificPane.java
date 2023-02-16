@@ -30,13 +30,10 @@ import javafx.scene.layout.GridPane;
 /**
  * Right side pane for REDCap
  */
-public class REDCapSpecificPane extends EDCSpecificPaneDefault {
+public class REDCapSpecificPane extends EDCSpecificPaneDefaultCommonFields {
 
     private ComboBox<String> fieldTypesComboBox;
     private ComboBox<String> textValidationComboBox;
-
-    private TextField minTextField;
-    private TextField maxTextField;
 
     public REDCapSpecificPane(){
 
@@ -56,29 +53,20 @@ public class REDCapSpecificPane extends EDCSpecificPaneDefault {
         gridPane.add(new Label(I18N.getLanguageText("redCapTextValidationType")), 0, ++rowNum);
         textValidationComboBox = new ComboBox<>();
         textValidationComboBox .setPrefWidth(100);
-        textValidationComboBoxSetup();
         gridPane.add(textValidationComboBox, 1, rowNum);
 
-        Label minLabel = new Label(I18N.getLanguageText("redCapMin"));
-        gridPane.add(minLabel,2,rowNum);
-        minTextField = new TextField();
-        minTextField.setMaxWidth(40);
-        gridPane.add(minTextField, 3, rowNum);
+        setupTopPaneCommonFields(gridPane, rowNum);
 
-        Label maxLabel = new Label(I18N.getLanguageText("redCapMax"));
-        gridPane.add(maxLabel,4,rowNum);
-        maxTextField = new TextField();
-        maxTextField.setMaxWidth(40);
-        gridPane.add(maxTextField, 5, rowNum);
-
-        setDisableMinMax(true);
         borderPane.setTop(gridPane);
+
+        textValidationComboBoxSetup();
     }
 
     /**
      * add the listeners
      */
-    void addListenersEDC(){
+    @Override
+    void addListenersEDC_local(){
         fieldTypesComboBox.setOnAction(event -> {
             fieldTypeChange();
             checkConditionalEnables();
@@ -87,8 +75,89 @@ public class REDCapSpecificPane extends EDCSpecificPaneDefault {
             textValidationChange();
             checkConditionalEnables();
         });
-        minTextField.textProperty().addListener((observable, oldValue, newValue) -> minFieldChange());
-        maxTextField.textProperty().addListener((observable, oldValue, newValue) -> maxFieldChange());
+    }
+
+    /**
+     * load values
+     */
+    @Override
+    void loadStoredValuesEDC_local() {
+        REDCapRunSettings runSettings = (REDCapRunSettings) RunSettings.getInstance();
+        fieldTypesComboBox.setValue(runSettings.getSelectedItemFieldType(key,itemId));
+        textValidationComboBox.setValue(runSettings.getSelectedItemTextValidationType(key, itemId));
+    }
+
+    /**
+     * disable fields
+     */
+    @Override
+    void disableFieldsEDC_local(){
+        fieldTypesComboBox.setDisable(true);
+        textValidationComboBox.setDisable(true);
+    }
+
+    /**
+     * enable fields
+     */
+    @Override
+    void enableFieldsEDC_local(){
+        fieldTypesComboBox.setDisable(false);
+        checkConditionalEnables();
+    }
+
+    /**
+     * checks for local fields influencing each other
+     */
+    private void checkConditionalEnables(){
+        // fieldType can be text or notes, or checkbox, singleselect, etc.
+        // the textValidationsComboBox is enabled when the fieldType is text
+        String selectedFieldType = fieldTypesComboBox.getSelectionModel().getSelectedItem();
+        if(selectedFieldType.equalsIgnoreCase("text")){
+            textValidationComboBox.setDisable(false);
+        }
+        else{
+            textValidationComboBox.getSelectionModel().select("");
+            textValidationComboBox.setDisable(true);
+        }
+        // check whether this means the min / max / units fields must also be enabled / disabled
+        checkMustEnableMinMaxUnits();
+    }
+
+    /**
+     * store values
+     */
+    @Override
+    void storeAllValuesEDC_local(){
+        fieldTypeChange();
+        textValidationChange();
+    }
+
+    /**
+     * store default values when a group select is performed
+     */
+    @Override
+    void storeAllValuesEDCGroupSelect_local(){
+        storeDefaultFieldType();
+        REDCapRunSettings runSettings = (REDCapRunSettings) RunSettings.getInstance();
+        runSettings.updateItemTextValidationType(key, itemId, REDCapDefinition.convertDataTypeToEDCValidationType(codebookItem.getItemDataType()));
+    }
+
+
+    /**
+     * determines whether min/max/units fields must be enabled based on the selected fieldType and the validationType
+     */
+    @Override
+    boolean checkMustEnableMinMaxUnits_local() {
+        // fieldType can be text or notes
+        // if it's text, the min/max validations may be used, but only if we're dealing with number or integer (not date)
+        String selectedFieldType = fieldTypesComboBox.getSelectionModel().getSelectedItem();
+        if(selectedFieldType.equalsIgnoreCase("text")){
+            String selectedValidation = textValidationComboBox.getSelectionModel().getSelectedItem();
+            return selectedValidation.equalsIgnoreCase("number") || selectedValidation.equalsIgnoreCase("integer");
+        }
+        else{
+            return false;
+        }
     }
 
     /**
@@ -108,53 +177,25 @@ public class REDCapSpecificPane extends EDCSpecificPaneDefault {
     }
 
     /**
-     * create the text validiation combobox
+     * create the text validation combobox
      */
     private void textValidationComboBoxSetup(){
-        // since it's a validation field, at this moment we're not guessing the initial value based on the Art-Decor
-        // datatype. Maybe in the future?
         textValidationComboBox.setItems(FXCollections.observableList(REDCapDefinition.getTextValidationOptionsList()));
+        String validationType = REDCapDefinition.convertDataTypeToEDCValidationType(codebookItem.getItemDataType());
+        textValidationComboBox.getSelectionModel().select(validationType);
     }
 
-    @Override
-    void loadStoredValuesEDC() {
+
+    private void storeDefaultFieldType(){
         REDCapRunSettings runSettings = (REDCapRunSettings) RunSettings.getInstance();
-        fieldTypesComboBox.setValue(runSettings.getSelectedItemFieldType(key,itemId));
-        textValidationComboBox.setValue(runSettings.getSelectedItemTextValidationType(key, itemId));
-        minTextField.setText(runSettings.getSelectedItemMinValue(key, itemId));
-        maxTextField.setText(runSettings.getSelectedItemMaxValue(key, itemId));
-        codelistPane.setSelectedFields();
-    }
-
-    /**
-     * disable fields
-     */
-    @Override
-    void disableFieldsEDC(){
-        fieldTypesComboBox.setDisable(true);
-        textValidationComboBox.setDisable(true);
-        setDisableMinMax(true);
-        codelistPane.disableFields();
-    }
-
-    /**
-     * enable fields
-     */
-    @Override
-    void enableFieldsEDC(){
-        fieldTypesComboBox.setDisable(false);
-        checkConditionalEnables();
-    }
-
-    /**
-     * store values
-     */
-    @Override
-    void storeAllValuesEDC(){
-        fieldTypeChange();
-        textValidationChange();
-        maxFieldChange();
-        minFieldChange();
+        // if the codebook item has a codelist, add fields such as radio, single-select, etc, based on the EDC
+        if(codebookItem.hasCodeList()){
+            runSettings.updateItemFieldType(key, itemId, FXCollections.observableList(REDCapDefinition.getFieldTypesWithCodeList()).get(0));
+        }
+        // if the codebook doesn't have a codelist, add fields such as text and textarea, based on the EDC
+        else{
+            runSettings.updateItemFieldType(key, itemId, FXCollections.observableList(REDCapDefinition.getFieldTypesWithoutCodeList()).get(0));
+        }
     }
 
     /**
@@ -163,49 +204,6 @@ public class REDCapSpecificPane extends EDCSpecificPaneDefault {
     private void fieldTypeChange(){
         REDCapRunSettings runSettings = (REDCapRunSettings) RunSettings.getInstance();
         runSettings.updateItemFieldType(key, itemId, fieldTypesComboBox.getSelectionModel().getSelectedItem());
-    }
-
-    private void checkConditionalEnables(){
-        if(fieldTypesComboBox.getSelectionModel().getSelectedItem().equalsIgnoreCase("text")){
-            textValidationComboBox.setDisable(false);
-        }
-        else{
-            textValidationComboBox.getSelectionModel().select("");
-            textValidationComboBox.setDisable(true);
-        }
-        if (mustEnableMinMax()) {
-            setDisableMinMax(false);
-        } else {
-            clearMinMax();
-            setDisableMinMax(true);
-        }
-    }
-
-    /**
-     * update the stored Min value
-     */
-    private void minFieldChange(){
-        REDCapRunSettings runSettings = (REDCapRunSettings) RunSettings.getInstance();
-        runSettings.updateItemMinValue(key, itemId, minTextField.getText());
-    }
-
-    /**
-     * update the stored Max value
-     */
-    private void maxFieldChange(){
-        REDCapRunSettings runSettings = (REDCapRunSettings) RunSettings.getInstance();
-        runSettings.updateItemMaxValue(key, itemId, maxTextField.getText());
-    }
-
-    /**
-     * Check whether the min/max fields must be enabled
-     */
-    private boolean mustEnableMinMax(){
-        String selectedItem = textValidationComboBox.getSelectionModel().getSelectedItem();
-        if(selectedItem==null){
-            return false;
-        }
-        return selectedItem.equalsIgnoreCase("number") || selectedItem.equalsIgnoreCase("integer");
     }
 
     /**
@@ -217,21 +215,5 @@ public class REDCapSpecificPane extends EDCSpecificPaneDefault {
             REDCapRunSettings runSettings = (REDCapRunSettings) RunSettings.getInstance();
             runSettings.updateItemTextValidationType(key, itemId, selectedItem);
         }
-    }
-
-    /**
-     * clear the min and max field
-     */
-    private void clearMinMax(){
-        maxTextField.setText("");
-        minTextField.setText("");
-    }
-
-    /**
-     * disable the min and max field
-     */
-    private void setDisableMinMax(boolean disable){
-        minTextField.setDisable(disable);
-        maxTextField.setDisable(disable);
     }
 }

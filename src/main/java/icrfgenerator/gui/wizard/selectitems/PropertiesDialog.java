@@ -17,10 +17,11 @@
  * along with iCRFGenerator. If not, see <http://www.gnu.org/licenses/>
  */
 
-package icrfgenerator.gui.wizard.page3;
+package icrfgenerator.gui.wizard.selectitems;
 
 
 import icrfgenerator.codebook.CodebookItem;
+//import icrfgenerator.codebook.artdecor.CodebookItemArtDecor;
 import icrfgenerator.gui.i18n.I18N;
 import icrfgenerator.resourcemanagement.ResourceManager;
 import icrfgenerator.utils.GUIUtils;
@@ -60,7 +61,6 @@ class PropertiesDialog extends Dialog {
             propertiesDialog.show();
         }
         propertiesDialog.toFront();
-
     }
 
     /**
@@ -70,7 +70,6 @@ class PropertiesDialog extends Dialog {
     static void updateWindow(CodebookItem codebookItem){
         propertiesDialog.setContent(codebookItem);
     }
-
 
     /**
      * constructor
@@ -96,10 +95,10 @@ class PropertiesDialog extends Dialog {
 
     /**
      * sets the dialog's content to the codebookItem's properties
-     * @param codebookItem
+     * @param codebookItem codebookItem with the properties
      */
     private void setContent(CodebookItem codebookItem){
-        Map<String, String> propertiesMap = codebookItem.getArtDecorPropertiesMap();
+        Map<String, String> propertiesMap = codebookItem.getCustomPropertiesMap();
         // if the codebookItem either has a blank Id or no custom properties, set the contents to a text message
         if(codebookItem.getId().equalsIgnoreCase("") || propertiesMap.size() == 0){
             getDialogPane().setContent(new Label(I18N.getLanguageText("edcNoCustomProperties")));

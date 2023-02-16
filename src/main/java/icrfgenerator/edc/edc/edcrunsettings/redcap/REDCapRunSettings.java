@@ -20,8 +20,9 @@
 package icrfgenerator.edc.edc.edcrunsettings.redcap;
 
 import icrfgenerator.edc.edc.EDC;
-import icrfgenerator.edc.edc.REDCapEDC;
 import icrfgenerator.settings.runsettings.RunSettings;
+
+import java.util.List;
 
 /**
  * REDCap specific runsettings
@@ -56,7 +57,10 @@ public class REDCapRunSettings extends RunSettings {
      * @param fieldType the new field type
      */
     public void updateItemFieldType(String key, String itemId, String fieldType){
-        getSelectedItems(key).updateItemFieldType(itemId,fieldType);
+        List<String> allKeys = RunSettings.getInstance().getAllLanguageKeysForMainKey(key);
+        allKeys.forEach(t->
+            getSelectedItems(t).updateItemFieldType(itemId,fieldType)
+        );
     }
 
     /**
@@ -66,7 +70,10 @@ public class REDCapRunSettings extends RunSettings {
      * @param fieldType the new text validation type
      */
     public void updateItemTextValidationType(String key, String itemId, String fieldType){
-        getSelectedItems(key).updateItemTextValidationType(itemId,fieldType);
+        List<String> allKeys = RunSettings.getInstance().getAllLanguageKeysForMainKey(key);
+        allKeys.forEach(t->
+            getSelectedItems(key).updateItemTextValidationType(itemId,fieldType)
+        );
     }
 
     /**
@@ -88,47 +95,6 @@ public class REDCapRunSettings extends RunSettings {
     public String getSelectedItemTextValidationType(String key, String itemId){
         return getSelectedItems(key).getSelectedItemTextValidationType(itemId);
     }
-
-    /**
-     * update the min value
-     * @param key codebook+version+language
-     * @param itemId item to update
-     * @param minValue the new min value
-     */
-    public void updateItemMinValue(String key, String itemId, String minValue){
-        getSelectedItems(key).updateItemMinValue(itemId,minValue);
-    }
-
-    /**
-     * update the max value
-     * @param key codebook+version+language
-     * @param itemId item to update
-     * @param maxValue the new max value
-     */
-    public void updateItemMaxValue(String key, String itemId, String maxValue){
-        getSelectedItems(key).updateItemMaxValue(itemId,maxValue);
-    }
-
-    /**
-     * returns the item's min value
-     * @param key codebook+version+language
-     * @param itemId item to update
-     * @return the item's min value
-     */
-    public String getSelectedItemMinValue(String key, String itemId){
-        return getSelectedItems(key).getSelectedItemMinValue(itemId);
-    }
-
-    /**
-     * returns the item's max value
-     * @param key codebook+version+language
-     * @param itemId item to update
-     * @return the item's max value
-     */
-    public String getSelectedItemMaxValue(String key, String itemId){
-        return getSelectedItems(key).getSelectedItemMaxValue(itemId);
-    }
-
 
 
 }

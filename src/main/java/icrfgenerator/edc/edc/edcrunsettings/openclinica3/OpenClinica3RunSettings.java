@@ -20,8 +20,9 @@
 package icrfgenerator.edc.edc.edcrunsettings.openclinica3;
 
 import icrfgenerator.edc.edc.EDC;
-import icrfgenerator.edc.edc.OpenClinica3EDC;
 import icrfgenerator.settings.runsettings.RunSettings;
+
+import java.util.List;
 
 /**
  * OpenClinica 3 specific item details
@@ -41,33 +42,14 @@ public class OpenClinica3RunSettings extends RunSettings {
     }
 
     /**
-     * update the data type of an item in a codebook+version+language
-     * @param key codebook+version+language
-     * @param itemId item to update
-     * @param dataType the new data type
-     */
-    public void updateItemDataType(String key, String itemId, String dataType){
-        ((OpenClinica3SelectedItemsContainer) selectedItemsContainerForCodebookDatasetLanguageMap.get(key)).updateItemDataType(itemId,dataType);
-    }
-
-    /**
      * update the field type of an item in a codebook+version+language
      * @param key codebook+version+language
      * @param itemId item to update
      * @param fieldType the new field type
      */
     public void updateItemFieldType(String key, String itemId, String fieldType){
-        ((OpenClinica3SelectedItemsContainer) selectedItemsContainerForCodebookDatasetLanguageMap.get(key)).updateItemFieldType(itemId,fieldType);
-    }
-
-    /**
-     * get the data type for an item in a codebook+version+language
-     * @param key codebook+version+language
-     * @param itemId id of item
-     * @return data type
-     */
-    public String getSelectedItemDataType(String key, String itemId){
-        return ((OpenClinica3SelectedItemsContainer) selectedItemsContainerForCodebookDatasetLanguageMap.get(key)).getSelectedItemDataType(itemId);
+        List<String> allKeys = RunSettings.getInstance().getAllLanguageKeysForMainKey(key);
+        allKeys.forEach(t->((OpenClinica3SelectedItemsContainer) selectedItemsContainerForCodebookDatasetLanguageMap.get(t)).updateItemFieldType(itemId,fieldType));
     }
 
     /**

@@ -19,6 +19,7 @@
 
 package icrfgenerator.settings.runsettings;
 
+import icrfgenerator.types.OperatorType;
 
 import java.util.*;
 
@@ -27,8 +28,8 @@ import java.util.*;
  * all EDCs are expected to create an extension of this class to allow for their specifics
  */
 public abstract class SelectedItemsContainer {
-    private List<String> selectedItemsList = new ArrayList<>();
-    private String key;
+    private final List<String> selectedItemsList = new ArrayList<>();
+    private final String key;
 
     protected Map<String, ItemDetails> itemDetailsMap = new HashMap<>();
 
@@ -39,6 +40,13 @@ public abstract class SelectedItemsContainer {
     protected SelectedItemsContainer(String key){
         this.key = key;
     }
+
+    /**
+     * abstract method which is necessary for every EDC to add an EDC-specific item
+     * @param key codebook+datasetId+language
+     * @param itemId id of the item
+     */
+    abstract protected void addItemEDC(String key, String itemId);
 
     /**
      * returns whether the item is selected
@@ -55,8 +63,11 @@ public abstract class SelectedItemsContainer {
      * @return set with codes + values
      */
     List<String> getTerminologyCodes(String itemId){
-        itemDetailsMap.get(itemId).getSelectedTerminologyCodes().sort(new SortByCode());
-        return itemDetailsMap.get(itemId).getSelectedTerminologyCodes();
+        if(itemDetailsMap.containsKey(itemId)) {
+            itemDetailsMap.get(itemId).getSelectedTerminologyCodes().sort(new SortByCode());
+            return itemDetailsMap.get(itemId).getSelectedTerminologyCodes();
+        }
+        return new ArrayList<>();
     }
 
     /**
@@ -77,8 +88,12 @@ public abstract class SelectedItemsContainer {
         itemDetailsMap.get(itemId).removeSelectedTerminologyCode(code);
     }
 
+    /**
+     * remove all terminology codes for an item
+     * @param itemId id of the item
+     */
     void removeTerminologies(String itemId){
-        itemDetailsMap.get(itemId).removeSelectedTerminologyCode();
+        itemDetailsMap.get(itemId).removeSelectedTerminologyCodes();
     }
 
     /**
@@ -100,7 +115,6 @@ public abstract class SelectedItemsContainer {
      */
     void removeItem(String itemId){
         selectedItemsList.remove(itemId);
-//        itemDetailsMap.remove(itemId);
     }
 
     /**
@@ -112,26 +126,135 @@ public abstract class SelectedItemsContainer {
     }
 
     /**
-     * returns the name of an item, based on the itemId
-     * @param itemId the identifier of the item
-     * @return the name of the item
+     * update the data type of the item
+     * @param itemId id of item
+     * @param dataType data type
      */
-//    String getSelectedItemItemName(String itemId){
-//        return itemDetailsMap.get(itemId).getItemName();
-//    }
+    void updateItemDataType(String itemId, String dataType){
+        itemDetailsMap.get(itemId).setItemDataType(dataType);
+    }
 
     /**
-     * abstract method which is necessary for every EDC to add an EDC-specific item
-     * @param key codebook+datasetId+language
-     * @param itemId id of the item
+     * returns data type for selected item
+     * @param itemId id of item
+     * @return data type
      */
-    abstract protected void addItemEDC(String key, String itemId);
+    String getSelectedItemDataType(String itemId){
+        return itemDetailsMap.get(itemId).getDataType();
+    }
 
+    /**
+     * update the required value of the item
+     * @param itemId id of the item
+     * @param value the new required value
+     */
+    void updateItemRequiredValue(String itemId, boolean value){
+        itemDetailsMap.get(itemId).setItemRequiredValue(value);
+    }
+
+    /**
+     * returns the required value of the item
+     * @param itemId id of the item
+     * @return the required value
+     */
+    boolean getSelectedItemRequiredValue(String itemId){
+        return itemDetailsMap.get(itemId).getItemRequiredValue();
+    }
+
+    /**
+     * update the min value of the item
+     * @param itemId id of the item
+     * @param value the new min value
+     */
+    void updateItemMinValue(String itemId, String value){
+        itemDetailsMap.get(itemId).setItemMinValue(value);
+    }
+
+    /**
+     * update the min value operator
+     * @param itemId           id of the item
+     * @param minCheckOperator new operator
+     */
+    void updateItemMinCheckFieldValue(String itemId, OperatorType minCheckOperator){
+        itemDetailsMap.get(itemId).setItemMinCheckFieldValue(minCheckOperator);
+    }
+
+    /**
+     * returns the min value operator
+     * @param itemId id of the item
+     * @return the min value operator
+     */
+    OperatorType getItemMinCheckFieldValue(String itemId){
+        return itemDetailsMap.get(itemId).getItemMinCheckFieldValue();
+    }
+
+    /**
+     * update the max value of the item
+     * @param itemId id of the item
+     * @param value  the new max value
+     */
+    void updateItemMaxValue(String itemId, String value){
+        itemDetailsMap.get(itemId).setItemMaxValue(value);
+    }
+
+    /**
+     * update the max value operator
+     * @param itemId           id of the item
+     * @param maxCheckOperator new operator
+     */
+    void updateItemMaxCheckFieldValue(String itemId, OperatorType maxCheckOperator){
+        itemDetailsMap.get(itemId).setItemMaxCheckFieldValue(maxCheckOperator);
+    }
+
+    /**
+     * returns the max value operator
+     * @param itemId id of the item
+     * @return the max value operator
+     */
+    OperatorType getItemMaxCheckFieldValue(String itemId){
+        return itemDetailsMap.get(itemId).getItemMaxCheckFieldValue();
+    }
+
+    /**
+     * returns the min value for selected item
+     * @param itemId id of item
+     * @return the min value
+     */
+    String getSelectedItemMinValue(String itemId){
+        return itemDetailsMap.get(itemId).getItemMinValue();
+    }
+
+    /**
+     * returns the max value for selected item
+     * @param itemId id of item
+     * @return the max value
+     */
+    String getSelectedItemMaxValue(String itemId){
+        return itemDetailsMap.get(itemId).getItemMaxValue();
+    }
+
+    /**
+     * update the width value of the item
+     * @param itemId id of the item
+     * @param value the new units value
+     */
+    void updateItemUnitsValue(String itemId, String value){
+        itemDetailsMap.get(itemId).setItemUnitsValue(value);
+    }
+
+    /**
+     * returns the units value of the item
+     * @param itemId id of the item
+     * @return the units value
+     */
+    String getSelectedItemUnitsValue(String itemId){
+        return itemDetailsMap.get(itemId).getItemUnitsValue();
+    }
 
     /**
      * sort the selected terminology codes
      */
-    class SortByCode implements Comparator<String> {
+    static class SortByCode implements Comparator<String> {
         @Override
         public int compare(String code1, String code2) {
             try{

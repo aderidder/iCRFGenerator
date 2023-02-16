@@ -68,3 +68,9 @@
         -fx-border-color: black;
         -fx-border-width: 4;
 }
+
+.bordered-gridpane {
+    -fx-border-color: black;
+    -fx-padding: 10;
+    -fx-border-width: 3;
+}

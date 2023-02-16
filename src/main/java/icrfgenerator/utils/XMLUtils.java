@@ -19,8 +19,6 @@
 
 package icrfgenerator.utils;
 
-import icrfgenerator.settings.GlobalSettings;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
@@ -39,43 +37,13 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.URL;
-import java.net.URLConnection;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
 import java.util.*;
 
 public class XMLUtils {
     private static final Logger logger = LogManager.getLogger(XMLUtils.class.getName());
-
-    /**
-     * downloads an XML codebook from Art-Decor
-     * @param datasetId id of the codebook+version
-     * @param language language
-     * @param fileName filename whence we will write the downloaded file
-     * @throws IOException exception
-     */
-    public static void downloadXMLFile(String codebookName, String datasetId, String language, String fileName) throws IOException{
-        String uri = ArtDecorCalls.getRetrieveDatasetURI(codebookName, datasetId,language);
-        logger.log(Level.INFO, "Retrieving a codebook using "+uri);
-
-        // open a url connection
-        URL url = new URL(uri);
-        URLConnection urlConnection = url.openConnection();
-
-        // set the connection timeout as specified in the global settings
-        urlConnection.setConnectTimeout(GlobalSettings.getCodebookConnectionTimeout());
-        urlConnection.setReadTimeout(GlobalSettings.getCodebookReadTimeout());
-
-        // get a stream to read data from
-        ReadableByteChannel readableByteChannel = Channels.newChannel(urlConnection.getInputStream());
-        FileOutputStream fileOutputStream = new FileOutputStream(fileName);
-        fileOutputStream.getChannel().transferFrom(readableByteChannel, 0, Long.MAX_VALUE);
-    }
 
     /**
      * cleans a string
@@ -104,7 +72,6 @@ public class XMLUtils {
      * @return true/false
      */
     public static boolean hasValidStatusCode(Element element){
-//        String statusCode = element.getAttribute("statusCode");
         String statusCode = getAttributeValue(element, "statusCode");
         return statusCode.equalsIgnoreCase("draft") || statusCode.equalsIgnoreCase("final");
     }
@@ -161,8 +128,6 @@ public class XMLUtils {
         return propertiesMap;
     }
 
-
-
     /**
      * returns the textcontent of a parent's child with a certain tag name
      * @param parent parent element
@@ -171,7 +136,9 @@ public class XMLUtils {
      */
     public static String getElementValue(Element parent, String tagName){
         Element element = getChildElementWithName(parent, tagName);
-        return element.getTextContent();
+        if(element!=null)
+            return element.getTextContent();
+        return null;
     }
 
     /**
@@ -201,8 +168,8 @@ public class XMLUtils {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", Integer.toString(indent));
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
 
             // collect the output stream in a string buffer and return it as a string
             StringWriter stringWriter = new StringWriter();

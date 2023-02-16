@@ -17,7 +17,9 @@
  * along with iCRFGenerator. If not, see <http://www.gnu.org/licenses/>
  */
 
-package icrfgenerator.codebook;
+package icrfgenerator.codebook.shared;
+
+import icrfgenerator.codebook.CodebookItem;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,14 +29,14 @@ import java.util.List;
  * this used to store the codebook's tree structure
  */
 public class CodebookStructureNode {
-    private List<CodebookStructureNode> children = new ArrayList<>();
-    private CodebookItem codebookItem;
+    private final List<CodebookStructureNode> children = new ArrayList<>();
+    private final CodebookItem codebookItem;
 
     /**
      * create a new codebook node
      * @param codebookItem the codebookItem for which the node is created
      */
-    CodebookStructureNode(CodebookItem codebookItem){
+    public CodebookStructureNode(CodebookItem codebookItem){
         this.codebookItem = codebookItem;
     }
 
@@ -42,7 +44,7 @@ public class CodebookStructureNode {
      * add a child to this node
      * @param codebookStructureNode the child
      */
-    void addChild(CodebookStructureNode codebookStructureNode){
+    public void addChild(CodebookStructureNode codebookStructureNode){
         children.add(codebookStructureNode);
     }
 

@@ -27,8 +27,6 @@ import icrfgenerator.settings.runsettings.ItemDetails;
 class REDCapItemDetails extends ItemDetails {
     private String fieldType;
     private String textValidationType="";
-    private String minValue="";
-    private String maxValue="";
 
     /**
      * constructor
@@ -71,35 +69,4 @@ class REDCapItemDetails extends ItemDetails {
         return fieldType;
     }
 
-    /**
-     * set the max value for this item
-     * @param minValue the max value
-     */
-    void setItemMinValue(String minValue){
-        this.minValue = minValue;
-    }
-
-    /**
-     * set the max value for this item
-     * @param maxValue the max value
-     */
-    void setItemMaxValue(String maxValue){
-        this.maxValue = maxValue;
-    }
-
-    /**
-     * get the item's min value
-     * @return the item's min value
-     */
-    String getItemMinValue(){
-        return minValue;
-    }
-
-    /**
-     * get the item's max value
-     * @return the item's max value
-     */
-    String getItemMaxValue(){
-        return maxValue;
-    }
 }

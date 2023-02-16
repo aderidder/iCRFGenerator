@@ -85,40 +85,4 @@ public class REDCapSelectedItemsContainer extends SelectedItemsContainer {
         return getItemDetails(itemId).getTextValidationType();
     }
 
-    /**
-     * update the min value of the item
-     * @param itemId id of the item
-     * @param value the new min value
-     */
-    void updateItemMinValue(String itemId, String value){
-        getItemDetails(itemId).setItemMinValue(value);
-    }
-
-    /**
-     * update the max value of the item
-     * @param itemId id of the item
-     * @param value the new max value
-     */
-    void updateItemMaxValue(String itemId, String value){
-        getItemDetails(itemId).setItemMaxValue(value);
-    }
-
-    /**
-     * returns the min value for selected item
-     * @param itemId id of item
-     * @return the min value
-     */
-    String getSelectedItemMinValue(String itemId){
-        return getItemDetails(itemId).getItemMinValue();
-    }
-
-    /**
-     * returns the max value for selected item
-     * @param itemId id of item
-     * @return the max value
-     */
-    String getSelectedItemMaxValue(String itemId){
-        return getItemDetails(itemId).getItemMaxValue();
-    }
-
 }

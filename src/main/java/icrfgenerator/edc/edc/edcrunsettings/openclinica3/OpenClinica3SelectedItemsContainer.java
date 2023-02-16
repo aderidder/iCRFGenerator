@@ -40,30 +40,12 @@ public class OpenClinica3SelectedItemsContainer extends SelectedItemsContainer {
     }
 
     /**
-     * update the data type of the item
-     * @param itemId id of item
-     * @param dataType data type
-     */
-    void updateItemDataType(String itemId, String dataType){
-        ((OpenClinica3ItemDetails)itemDetailsMap.get(itemId)).setItemDataType(dataType);
-    }
-
-    /**
      * update the field type of the item
      * @param itemId id of item
      * @param fieldType field type
      */
     void updateItemFieldType(String itemId, String fieldType){
         ((OpenClinica3ItemDetails)itemDetailsMap.get(itemId)).setItemFieldType(fieldType);
-    }
-
-    /**
-     * return data type for selected item
-     * @param itemId id of item
-     * @return data type
-     */
-    String getSelectedItemDataType(String itemId){
-        return ((OpenClinica3ItemDetails)itemDetailsMap.get(itemId)).getDataType();
     }
 
     /**

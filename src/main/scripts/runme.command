@@ -19,4 +19,4 @@
 SCRIPTPATH="$( cd "$(dirname "$0")" ; pwd -P )"
 cd "$SCRIPTPATH"
 xattr -cr * > /dev/null 2>&1
-java-runtime/bin/java --add-opens javafx.graphics/javafx.scene=ALL-UNNAMED -cp iCRFGenerator.jar:./lib/* icrfgenerator.CRFGenerator
+java-runtime/bin/java --add-opens javafx.graphics/javafx.scene=ALL-UNNAMED --add-opens=java.base/java.net=ALL-UNNAMED -Dfile.encoding=UTF-8 -cp iCRFGenerator.jar:./lib/* icrfgenerator.CRFGenerator

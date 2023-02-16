@@ -66,7 +66,7 @@ public class EMXEDC extends EDCDefault{
      * add data to the template
      */
     @Override
-    public void generateCRF() {
+    public void generateCRF(List<String> keys, String language) {
         EMXRunSettings runSettings = (EMXRunSettings) RunSettings.getInstance();
         CodebookManager codebookManager = CodebookManager.getInstance();
 
@@ -74,7 +74,7 @@ public class EMXEDC extends EDCDefault{
         Sheet dataSheet = workbook.getSheet("data");
 
         // get all the keys (codebook + datasetId + language)
-        List<String> keys = runSettings.getKeys();
+//        List<String> keys = runSettings.getSelectedCodebookKeys();
         for (String key : keys) {
             // retrieve the selected items for the key and add each item to the template
             List<String> selectedItemIds = runSettings.getSelectedItemIdentifiers(key);
@@ -85,8 +85,8 @@ public class EMXEDC extends EDCDefault{
                 // such as the item's name and its ontology values
                 CodebookItem codebookItem = codebookManager.getCodebookItem(key, itemId);
                 String itemName = codebookItem.getItemName();
-                String itemDescription = codebookItem.getDescription();
-                String ontologyCode = codebookItem.getCode();
+                String itemDescription = codebookItem.getItemDescription();
+                String ontologyCode = codebookItem.getCodeForItem();
                 String nillable = Boolean.toString(runSettings.getSelectedItemNillableValue(key, itemId)).toUpperCase();
                 String aggregateable = Boolean.toString(runSettings.getSelectedItemAggregateableValue(key, itemId)).toUpperCase();
                 String minVal = runSettings.getSelectedItemMinValue(key,itemId);
@@ -95,14 +95,14 @@ public class EMXEDC extends EDCDefault{
 
                 // should we do something with this?
                 if(!ontologyCode.equalsIgnoreCase("")) {
-                    String ontologyCodeSystem = codebookItem.getCodeSystem();
-                    String ontologyDescription = codebookItem.getCodeDescription();
+                    String ontologyCodeSystem = codebookItem.getCodeSystemForItem();
+                    String ontologyDescription = codebookItem.getItemCodeDescription();
                 }
 
                 // add the codelist to the file if the item has one
                 if (codebookManager.codebookItemHasCodeList(key, itemId)) {
                     List<String> selectedCodes = runSettings.getSelectedItemSelectedTerminologyCodes(key, itemId);
-                    List<String> selectedValues = selectedCodes.stream().map(t->codebookManager.getValueForCode(key, itemId, t)).collect(Collectors.toList());
+                    List<String> selectedValues = selectedCodes.stream().map(t->codebookManager.getValueForOptionCode(key, itemId, t)).collect(Collectors.toList());
                     refEntity = addList(itemName, selectedValues);
                 }
 
@@ -143,12 +143,6 @@ public class EMXEDC extends EDCDefault{
         }
     }
 
-    /**
-     * add the
-     * @param itemName
-     * @return
-     */
-//    private String addList(String key, String itemId, String itemName, List<String> selectedCodes, CodebookManager codebookManager){
     private String addList(String itemName, List<String> selectedValues){
         String sheetName = "cat_"+itemName;
         // add the entry to the entities

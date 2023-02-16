@@ -19,8 +19,7 @@
 
 package icrfgenerator.edc.edc.edcdefinitions;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * definitions for OpenClinica 3
@@ -30,7 +29,24 @@ public class OpenClinica3Definition{
     private static final List<String> nonCodeListFieldTypes = Arrays.asList("text", "textarea");
 
     private static final List<String> fieldTypeWithDefaultList = Arrays.asList("single-select", "multi-select");
-    private static final List<String> supportedDatatypes = Arrays.asList("INT", "REAL", "ST", "DATE");
+//    private static final List<String> supportedDatatypes = Arrays.asList("INT", "REAL", "ST", "DATE");
+
+    private static final Map<String, List<String>> fieldTypeDataTypesMap = new HashMap<>();
+
+    static {
+//        fieldTypeDataTypesMap.put("textarea", List.of("ST"));
+//        fieldTypeDataTypesMap.put("text", List.of("INT", "REAL", "ST", "DATE"));
+//        fieldTypeDataTypesMap.put("single-select", List.of("INT", "ST"));
+//        fieldTypeDataTypesMap.put("radio", List.of("INT", "ST"));
+//        fieldTypeDataTypesMap.put("multi-select", List.of("INT", "ST"));
+//        fieldTypeDataTypesMap.put("checkbox", List.of("INT", "ST"));
+        fieldTypeDataTypesMap.put("textarea", new ArrayList<>(List.of("ST")));
+        fieldTypeDataTypesMap.put("text", new ArrayList<>(List.of("INT", "REAL", "ST", "DATE")));
+        fieldTypeDataTypesMap.put("single-select", new ArrayList<>(List.of("INT", "ST")));
+        fieldTypeDataTypesMap.put("radio", new ArrayList<>(List.of("INT", "ST")));
+        fieldTypeDataTypesMap.put("multi-select", new ArrayList<>(List.of("INT", "ST")));
+        fieldTypeDataTypesMap.put("checkbox", new ArrayList<>(List.of("INT", "ST")));
+    }
 
     /**
      * returns a list with the field types that have a codelist
@@ -54,36 +70,25 @@ public class OpenClinica3Definition{
      * @return the converted datatype or string
      */
     public static String convertDataTypeToEDCDataType(String dataType, String codeDataType){
-        String converted;
-        switch (dataType){
-            case "code":
-                converted = convertDataTypeToEDCDataType(codeDataType, "");
-//                converted = codeDataType;
-                break;
-            case "integer":
-            case "count":
-            case "boolean":
-                converted = "INT";
-                break;
-            case "date":
-                converted = "DATE";
-                break;
-            case "string":
-            case "identifier": //could be INT, but assume it's ST
-            case "quantity": // could be INT, but also REAL, we'll set it to ST to be safe
-            case "duration": // could be INT, but also REAL, we'll set it to ST to be safe
-            default:
-                converted = "ST";
-        }
-        return converted;
+        return switch (dataType) {
+            case "code" -> convertDataTypeToEDCDataType(codeDataType, "");
+            case "decimal", "quantity" -> "REAL";
+            case "integer", "count", "boolean" -> "INT";
+            case "date" -> "DATE";
+            case "string", "identifier", "duration", "datetime" -> "ST";
+            default -> "ST";
+        };
     }
 
     /**
      * returns a list of the supported data types
      * @return a list of the supported data types
      */
-    public static List<String> getSupportedDatatypes() {
-        return supportedDatatypes;
+//    public static List<String> getSupportedDatatypes() {
+//        return supportedDatatypes;
+//    }
+    public static List<String> getDataTypesList(String fieldType){
+        return fieldTypeDataTypesMap.get(fieldType);
     }
 
     /**

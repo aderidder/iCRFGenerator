@@ -17,14 +17,14 @@
  * along with iCRFGenerator. If not, see <http://www.gnu.org/licenses/>
  */
 
-package icrfgenerator.gui.wizard.page3;
+package icrfgenerator.gui.wizard.selectitems;
 
 import icrfgenerator.codebook.CodebookManager;
 import icrfgenerator.gui.i18n.I18N;
 import icrfgenerator.resourcemanagement.ResourceManager;
 import icrfgenerator.settings.runsettings.RunSettings;
 import icrfgenerator.utils.GUIUtils;
-import icrfgenerator.utils.GeneralUtils;
+import icrfgenerator.utils.KeyUtils;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.value.ChangeListener;
@@ -36,7 +36,7 @@ import org.controlsfx.dialog.WizardPane;
 
 import java.util.*;
 
-public class Page3 extends WizardPane {
+public class SelectItemsPage extends WizardPane {
     private static final CodebookManager codebookManager = CodebookManager.getInstance();
     private static RunSettings runSettings;
 
@@ -53,8 +53,8 @@ public class Page3 extends WizardPane {
         runSettings = RunSettings.getInstance();
     }
 
-    public Page3(int wizardWidth, int wizardHeight){
-        this.setId("Page3");
+    public SelectItemsPage(int wizardWidth, int wizardHeight){
+        this.setId("SelectItemsPage");
         this.getStylesheets().clear();
         this.setPrefWidth(wizardWidth);
         this.setPrefHeight(wizardHeight);
@@ -83,70 +83,32 @@ public class Page3 extends WizardPane {
      */
     private Tab getTab(String codebook, String datasetId){
         Tab tab;
-        // new datasetId tab, to which we'll add the tabs
-        Tab newCodebookVersionTab = getCodebookVersionTab(codebook, datasetId);
-        // retrieve the tab pane that is stored within (which contains / will contain tabs for each selected language)
-        TabPane newCodebookVersionTabPane = (TabPane) newCodebookVersionTab.getContent();
+        String mainSimpleLanguage = runSettings.getMainSimpleLanguage();
 
-        newCodebookVersionTabPane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
-            @Override
-            public void changed(ObservableValue<? extends Tab> observableValue, Tab oldTab, Tab newTab) {
-                ((LanguageTab)newTab).updatePropertiesDialogWindow();
-            }
-        });
-
-        // fetch the selected languages
-        List<String> languages = runSettings.getSelectedLanguages(codebook, datasetId);
-        for(String language:languages){
-            String key = GeneralUtils.getCodebookItemsMapKey(codebook, datasetId, language);
+        String key = KeyUtils.getSimpleLanguageKey(codebook, datasetId, mainSimpleLanguage);
             if(!tabMap.containsKey(key)){
-                tabMap.put(key, new LanguageTab(codebook, datasetId, language, this));
+                tabMap.put(key, new LanguageTab(codebook, datasetId, mainSimpleLanguage, this, generateTabTitle(codebook, datasetId)));
             }
             tab = tabMap.get(key);
-            newCodebookVersionTabPane.getTabs().add(tab);
-        }
 
-        return newCodebookVersionTab;
-    }
-
-
-    /**
-     * creates a tab for the codebook + datasetId
-     * @param codebook codebook name
-     * @param datasetId codebook datasetId
-     * @return the new tab
-     */
-    private Tab getCodebookVersionTab (String codebook, String datasetId){
-        String key = codebook+datasetId;
-        String version = codebookManager.getDatasetVersion(codebook, datasetId);
-        String datasetName = codebookManager.getDatasetName(codebook, datasetId);
-
-        Tab tab = new Tab();
-        if(datasetName.length()>40) {
-            tab.setText(datasetName.substring(0,37)+"..."+" "+version);
-            tab.setTooltip(new Tooltip(datasetName));
-//            GUIUtils.addTooltip(tab, datasetName);
-        }
-        else{
-            tab = new Tab(datasetName+" "+version);
-        }
-
-//        Tab tab = new Tab(datasetName+" "+version);
-        tab.setId(key);
-        tab.setClosable(false);
-        tab.setContent(new TabPane());
-//        tab.setOnSelectionChanged(e->updatePropertiesDialogWindow(tab));
         return tab;
     }
-//
-//    private void updatePropertiesDialogWindow(Tab tab){
-//        if (tab.isSelected()) {
-//            List<Tab> tabs = ((TabPane)tab.getContent()).getTabs();
-//            for(Tab subTab:tabs) {
-//                ((LanguageTab)subTab).updatePropertiesDialogWindow();
-//            }
-//        }
-//    }
+
+    /**
+     * generates the title for the tab based on some variables
+     * @param codebook  codebook
+     * @param datasetId dataset id
+     * @return the title
+     */
+    private String generateTabTitle (String codebook, String datasetId){
+        String version = codebookManager.getDatasetVersion(codebook, datasetId);
+        String datasetName = codebookManager.getDatasetName(codebook, datasetId);
+        String title=datasetName;
+        if(datasetName.length()>40) {
+            title = datasetName.substring(0,37)+"...";
+        }
+        return title+" "+version+" ("+runSettings.getMainSimpleLanguage()+")";
+    }
 
     /**
      * starts codebook loading in the background to prevent an unresponsive UI
@@ -156,6 +118,7 @@ public class Page3 extends WizardPane {
         Task<Void> task = new Task<>() {
             @Override
             protected Void call() {
+                runSettings.determineLanguageBasedIdentifiers();
                 codebookManager.updateCodebookItems();
                 return null;
             }
@@ -165,9 +128,11 @@ public class Page3 extends WizardPane {
         new Thread(task).start();
     }
 
-
+    /**
+     * sets the content for when loading failed
+     */
     private void setFailedLoadingContent(){
-        this.setContent(GUIUtils.createErrorPane(I18N.getLanguageText("page3ErrorPane")));
+        this.setContent(GUIUtils.createErrorPane(I18N.getLanguageText("pageSelectItemsErrorPane")));
         showButtons();
         checkMayProceed();
     }
@@ -190,24 +155,24 @@ public class Page3 extends WizardPane {
                 newTabPane.getTabs().add(tab);
             }
         }
+
         this.setContent(newTabPane);
         selectFirstTab(newTabPane);
 
-        newTabPane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<Tab>() {
+        newTabPane.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<>() {
             @Override
             public void changed(ObservableValue<? extends Tab> observableValue, Tab oldTab, Tab newTab) {
-                TabPane tabPane = (TabPane)newTab.getContent();
-                ((LanguageTab)tabPane.getSelectionModel().getSelectedItem()).updatePropertiesDialogWindow();
+                ((LanguageTab)newTab).updatePropertiesDialogWindow();
             }
         });
 
         showButtons();
-        this.setHeaderText(I18N.getLanguageText("page3Title")+" "+runSettings.getEDC().getEDCName()+" CRF...");
+        this.setHeaderText(I18N.getLanguageText("pageSelectItemsTitle")+" "+runSettings.getEDC().getEDCName()+" CRF...");
         checkMayProceed();
     }
 
     /**
-     * if we select e.g. the second language tab, navigate to the summary and then
+     * if we select e.g. the second tab, navigate to the summary and then
      * navigate back, the item selection right side will have visual issues
      * so we basically reselect the first tab and first language tab
      * @param newTabPane tab pane
@@ -215,18 +180,14 @@ public class Page3 extends WizardPane {
     private void selectFirstTab(TabPane newTabPane){
         newTabPane.getSelectionModel().selectLast();
         newTabPane.getSelectionModel().selectFirst();
-        Tab firstTab = newTabPane.getTabs().get(0);
-        TabPane tabPane = (TabPane) firstTab.getContent();
-        tabPane.getSelectionModel().selectLast();
-        tabPane.getSelectionModel().selectFirst();
     }
 
     /**
      * create some loading awareness for the user
      */
     private void setLoadingContent(){
-        this.setHeaderText(I18N.getLanguageText("page3LoadingPageTitle"));
-        this.setContent(GUIUtils.createLoadingPane(I18N.getLanguageText("page3LoadingTitle")));
+        this.setHeaderText(I18N.getLanguageText("pageSelectItemsLoadingPageTitle"));
+        this.setContent(GUIUtils.createLoadingPane(I18N.getLanguageText("pageSelectItemsLoadingTitle")));
     }
 
     /**
@@ -267,7 +228,6 @@ public class Page3 extends WizardPane {
 
     /**
      * things to do when we leave the page
-     *
      * @param wizard the wizard
      */
     @Override

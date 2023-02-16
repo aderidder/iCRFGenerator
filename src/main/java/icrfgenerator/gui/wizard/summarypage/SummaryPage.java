@@ -17,7 +17,7 @@
  * along with iCRFGenerator. If not, see <http://www.gnu.org/licenses/>
  */
 
-package icrfgenerator.gui.wizard.page4;
+package icrfgenerator.gui.wizard.summarypage;
 
 import icrfgenerator.gui.i18n.I18N;
 import icrfgenerator.settings.runsettings.RunSettings;
@@ -27,10 +27,10 @@ import javafx.scene.text.Text;
 import org.controlsfx.dialog.Wizard;
 import org.controlsfx.dialog.WizardPane;
 
-public class Page4 extends WizardPane {
+public class SummaryPage extends WizardPane {
 
-    public Page4(int wizardWidth, int wizardHeight){
-        this.setId("Page4");
+    public SummaryPage(int wizardWidth, int wizardHeight){
+        this.setId("SummaryPage");
         this.getStylesheets().clear();
         this.setPrefWidth(wizardWidth);
         this.setPrefHeight(wizardHeight);

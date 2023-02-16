@@ -23,15 +23,13 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
- * Class for internationlisation
+ * Class for internationalisation
  */
 public class I18N {
     private static ResourceBundle resourceBundle;
 
-    /**
-     * initialise with English
-     */
     static {
+        // initialise with English
         setLocale("en");
         initBundle();
     }

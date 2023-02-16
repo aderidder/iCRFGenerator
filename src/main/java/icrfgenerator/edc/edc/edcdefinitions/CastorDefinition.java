@@ -52,25 +52,16 @@ public class CastorDefinition {
      * @return the description of the field type
      */
     public static String getFieldTypeDescription(String fieldType){
-        String description;
-        switch (fieldType){
-            case "checkbox":
-                description = "Checkbox"; break;
-            case "date":
-                description = "Date"; break;
-            case "dropdown":
-                description = "Dropdown"; break;
-            case "numeric":
-                description = "Numeric field"; break;
-            case "radio":
-                description = "Radiobutton"; break;
-            case "string":
-                description = "Textfield"; break;
-            case "textarea":
-                description = "Multiline textfield"; break;
-            default: description="Unknown...";
-        }
-        return description;
+        return switch (fieldType) {
+            case "checkbox" -> "Checkbox";
+            case "date" -> "Date";
+            case "dropdown" -> "Dropdown";
+            case "numeric" -> "Numeric field";
+            case "radio" -> "Radiobutton";
+            case "string" -> "Textfield";
+            case "textarea" -> "Multiline textfield";
+            default -> "Unknown...";
+        };
     }
 
     /**
@@ -79,27 +70,14 @@ public class CastorDefinition {
      * @return converted datatype or string
      */
     public static String convertDataTypeToEDCFieldType(String dataType){
-        String converted;
-        switch (dataType){
-            case "code":
-                converted = "dropdown";
-                break;
-            case "integer":
-            case "count":
-            case "quantity":
-            case "boolean":
-            case "duration":
-                converted = "numeric";  // not 100% about boolean and duration...
-                break;
-            case "date":
-                converted = "date";
-                break;
-            case "string":
-            case "identifier": //could be INT, but assume it's ST
-             default:
-                converted = "string";
-        }
-        return converted;
+        return switch (dataType) {
+            case "code" -> "dropdown";
+            case "integer", "decimal", "count", "quantity", "boolean", "duration" -> "numeric";  // not 100% about boolean and duration...
+            case "date" -> "date";
+            case "string", "identifier" -> "string";
+            case "datetime" -> "datetime";
+            default -> "string";
+        };
     }
 
 }

@@ -19,8 +19,10 @@
 
 package icrfgenerator.codebook;
 
+import icrfgenerator.codebook.shared.CodebookStructureNode;
+
 import icrfgenerator.settings.runsettings.RunSettings;
-import icrfgenerator.utils.GeneralUtils;
+import icrfgenerator.utils.KeyUtils;
 
 import java.util.HashMap;
 import java.util.List;
@@ -39,9 +41,7 @@ public class CodebookManager {
         return codebookManager;
     }
 
-    private CodebookManager(){
-
-    }
+    private CodebookManager(){}
 
     /**
      * Returns a single codebookItem for a specific item in codebook+datasetId+language
@@ -60,7 +60,7 @@ public class CodebookManager {
      * @return true/false
      */
     public boolean codebookItemHasCodeList(String key, String itemId){
-        return codebookItemsMap.get(key).getCodebookItem(itemId).hasCodeList();
+        return codebookItemsMap.get(key).codebookItemHasCodeList(itemId);
     }
 
     /**
@@ -70,7 +70,7 @@ public class CodebookManager {
      * @return the name of an item
      */
     public String getItemName(String key, String itemId){
-        return codebookItemsMap.get(key).getCodebookItem(itemId).getItemName();
+       return codebookItemsMap.get(key).getItemName(itemId);
     }
 
     /**
@@ -80,12 +80,50 @@ public class CodebookManager {
      * @param code the code for which to retrieve the label
      * @return the label of the code
      */
-    public String getValueForCode(String key, String itemId, String code){
-        return codebookItemsMap.get(key).getCodebookItem(itemId).getValueForCode(code);
+    public String getValueForOptionCode(String key, String itemId, String code){
+        return codebookItemsMap.get(key).getValueForOptionCode(itemId, code);
     }
 
-    public String getCodesystemForCode(String key, String itemId, String code){
-        return codebookItemsMap.get(key).getCodebookItem(itemId).getCodesystemForCode(code);
+    /**
+     * returns the codesystem for a code for an item
+     * @param key codebook + datasetId + language
+     * @param itemId id of an item in the codebook
+     * @param code the code for which to retrieve the label
+     * @return the codesystem of the code
+     */
+    public String getCodesystemForOptionCode(String key, String itemId, String code){
+        return codebookItemsMap.get(key).getCodesystemForOptionCode(itemId, code);
+    }
+
+    /**
+     * returns the description for a code for an item
+     * @param key codebook + datasetId + language
+     * @param itemId id of an item in the codebook
+     * @param code the code for which to retrieve the label
+     * @return the description of the code
+     */
+    public String getDescriptionForOptionCode(String key, String itemId, String code){
+        return codebookItemsMap.get(key).getDescriptionForOptionCode(itemId, code);
+    }
+
+    /**
+     * returns the codesystem for an item
+     * @param key codebook + datasetId + language
+     * @param itemId id of an item in the codebook
+     * @return the codesystem for an item
+     */
+    public String getCodeSystemForItem(String key, String itemId){
+        return codebookItemsMap.get(key).getCodeSystemForItem(itemId);
+    }
+
+    /**
+     * returns the code for an item
+     * @param key codebook + datasetId + language
+     * @param itemId id of an item in the codebook
+     * @return the code for an item
+     */
+    public String getCodeForItem(String key, String itemId){
+        return codebookItemsMap.get(key).getCodeForItem(itemId);
     }
 
     /**
@@ -103,19 +141,30 @@ public class CodebookManager {
             List<String> datasetIds = runSettings.getCodebookSelectedDatasetIds(codebookName);
             // for each selected datasetId
             for(String datasetId:datasetIds){
-                // get the selected languages
-                List<String> languages = runSettings.getSelectedLanguages(codebookName, datasetId);
-                // for each selected language
-                for(String language:languages){
-                    // get the key (codebookname + datasetId + language)
-                    String key = GeneralUtils.getCodebookItemsMapKey(codebookName,datasetId,language);
-                    // check whether this codebook already exists in the map
-                    if(!codebookItemsMap.containsKey(key)){
-                        // if it doesn't, addChild it
-                        codebookItemsMap.put(key, new Codebook(datasetId, language, codebookName));
-                    }
-                }
+                updateCodebookItemsLanguages(codebookName, datasetId, runSettings.getMainSimpleLanguage());
+                runSettings.getOtherSimpleLanguages().forEach(t->updateCodebookItemsLanguages(codebookName, datasetId, t));
             }
+        }
+    }
+
+    /**
+     * next step in the updateCodebookItems process. Loads the codebooks and stores them in a map
+     * @param codebookName   name of the codebook
+     * @param datasetId      id of the codebook
+     * @param simpleLanguage language of the codebook
+     */
+    private void updateCodebookItemsLanguages(String codebookName, String datasetId, String simpleLanguage){
+        String key = KeyUtils.getSimpleLanguageKey(codebookName, datasetId, simpleLanguage);
+
+        // To be able to get the codebook(s), we need to know the full language, since e.g. ART-DECOR uses this
+        // in the rest-call. We'll grab the extendedLanguage and assume there's a 1-1 mapping (e.g. en --> "en-US" and not
+        // "en" --> "en-US", "en-UK"
+        String extendedLanguage = CodebookManager.getInstance().getDatasetExtendedLanguagesForSimpleLanguage(codebookName, datasetId, simpleLanguage).get(0);
+
+        // check whether this codebook already exists in the map
+        if(!codebookItemsMap.containsKey(key)){
+            // if it doesn't, add it
+            codebookItemsMap.put(key, CodebookFactory.generateCodebook(datasetId, extendedLanguage, codebookName));
         }
     }
 
@@ -126,7 +175,7 @@ public class CodebookManager {
         List<String> codebookNames = RunSettings.getInstance().getSelectedCodebooks();
         for(String codebookName:codebookNames){
             if(!codebookMetaDataMap.containsKey(codebookName)){
-                codebookMetaDataMap.put(codebookName, new CodebookMetaData(codebookName));
+                codebookMetaDataMap.put(codebookName, CodebookMetaDataFactory.getMetaData(codebookName));
             }
         }
     }
@@ -139,7 +188,6 @@ public class CodebookManager {
     public List<String> getDatasetIdentifiers(String codebookName){
         return codebookMetaDataMap.get(codebookName).getCodebookDatasetIdentifiers();
     }
-
 
     /**
      * returns the version of a codebook dataset
@@ -172,13 +220,27 @@ public class CodebookManager {
     }
 
     /**
-     * returns a list with the available langues for a codebook+version
-     * @param codebookName name of the codebook
-     * @param datasetIdentifier version of the codebook
-     * @return a list with the available langues for a codebook+version
+     * returns a list with the available languages for a dataset
+     * @param codebookName      name of the codebook
+     * @param datasetIdentifier identifier of the dataset
+     * @return list with the available languages for a dataset
      */
-    public List<String> getLanguagesForCodebookDataset(String codebookName, String datasetIdentifier){
-        return codebookMetaDataMap.get(codebookName).getDatasetLanguages(datasetIdentifier);
+    public List<String> getDatasetSimpleLanguages(String codebookName, String datasetIdentifier){
+        return codebookMetaDataMap.get(codebookName).getDatasetSimpleLanguages(datasetIdentifier);
+    }
+
+    /**
+     * returns a list with a mapping of the simpleLanguage to the extendedLanguage for a dataset.
+     * E.g. calling it with "en" could return "en-US", "en-UK", etc.
+     * Caution: the program does assume at some point that there is only a 1-1 mapping and that if a codeboook
+     * is available for en-US, it is not also available for en-UK.
+     * @param codebookName      name of the codebook
+     * @param datasetIdentifier identifier of the dataset
+     * @param simpleLanguage    simple language, e.g. en
+     * @return a list with the extended names for the codebook for the simple language
+     */
+    public List<String> getDatasetExtendedLanguagesForSimpleLanguage(String codebookName, String datasetIdentifier, String simpleLanguage){
+        return codebookMetaDataMap.get(codebookName).getDatasetExtendedLanguagesForSimpleLanguage(datasetIdentifier, simpleLanguage);
     }
 
     /**

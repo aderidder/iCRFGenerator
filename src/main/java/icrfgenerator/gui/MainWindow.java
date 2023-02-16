@@ -68,7 +68,7 @@ public class MainWindow {
 
     /**
      * setup the main window
-     * @param primaryStage
+     * @param primaryStage primary stage
      */
     public void createMainWindow(Stage primaryStage) {
         // create the components
@@ -197,8 +197,6 @@ public class MainWindow {
             GUIWizard.resetWizard();
         });
     }
-
-
 
     /**
      * Create center pane which contains the log area
@@ -372,18 +370,14 @@ public class MainWindow {
         }
 
         /**
-         * process for savind the CRF
+         * process for saving the CRF(s)
          * @return null
          */
         @Override
         public Void call() {
             try {
                 // fetch which EDC was used, inialise the necessary stuff for the EDC and generate the CRF
-                RunSettings runSettings = RunSettings.getInstance();
-                EDC edc = runSettings.getEDC();
-                // change this name?
-                edc.setup();
-                edc.generateCRF();
+                EDC edc = RunSettings.getInstance().getEDC();
 
                 // start a filechosser to allow a user to save the file
                 Platform.runLater(() -> {
@@ -393,12 +387,13 @@ public class MainWindow {
                     File file = fileChooser.showSaveDialog(primaryStage);
 
                     if (file != null) {
-                        runSettings.getEDC().writeFile(file);
+                        edc.generateCRFs(file);
                         logger.log(Level.INFO, I18N.getLanguageText("mainDone"));
                     }
                     else{
                         logger.log(Level.INFO, I18N.getLanguageText("mainCancelSave"));
                     }
+
                 });
 
             } catch (Exception e){
@@ -408,5 +403,4 @@ public class MainWindow {
             return null;
         }
     }
-
 }

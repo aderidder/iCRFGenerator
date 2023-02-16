@@ -49,24 +49,6 @@ public class EMXSelectedItemsContainer extends SelectedItemsContainer {
     }
 
     /**
-     * update the data type of the item
-     * @param itemId id of item
-     * @param dataType data type
-     */
-    void updateItemDataType(String itemId, String dataType){
-        getItemDetails(itemId).setItemDataType(dataType);
-    }
-
-    /**
-     * returns data type for selected item
-     * @param itemId id of item
-     * @return data type
-     */
-    String getSelectedItemDataType(String itemId){
-        return getItemDetails(itemId).getDataType();
-    }
-
-    /**
      * update the nillable value of the item
      * @param itemId id of the item
      * @param value the new required value
@@ -102,59 +84,4 @@ public class EMXSelectedItemsContainer extends SelectedItemsContainer {
         return getItemDetails(itemId).getItemAggregateableValue();
     }
 
-
-    /**
-     * update the min value of the item
-     * @param itemId id of the item
-     * @param value the new min value
-     */
-    void updateItemMinValue(String itemId, String value){
-        getItemDetails(itemId).setItemMinValue(value);
-    }
-
-    /**
-     * update the max value of the item
-     * @param itemId id of the item
-     * @param value the new max value
-     */
-    void updateItemMaxValue(String itemId, String value){
-        getItemDetails(itemId).setItemMaxValue(value);
-    }
-
-    /**
-     * returns the min value of the item
-     * @param itemId id of the item
-     * @return the min value
-     */
-    String getSelectedItemMinValue(String itemId){
-        return getItemDetails(itemId).getItemMinValue();
-    }
-
-    /**
-     * returns the max value of the item
-     * @param itemId id of the item
-     * @return the max value
-     */
-    String getSelectedItemMaxValue(String itemId){
-        return getItemDetails(itemId).getItemMaxValue();
-    }
-
-
-//    /**
-//     * update the width value of the item
-//     * @param itemId id of the item
-//     * @param value the new widthvalue
-//     */
-//    void updateItemWidthValue(String itemId, String value){
-//        getItemDetails(itemId).setItemWidthValue(value);
-//    }
-//
-//    /**
-//     * returns the width value of the item
-//     * @param itemId id of the item
-//     * @return the width value
-//     */
-//    String getSelectedItemWidthValue(String itemId){
-//        return getItemDetails(itemId).getItemWidthValue();
-//    }
 }
