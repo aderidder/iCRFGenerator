@@ -2,11 +2,15 @@
 While we aim to improve the tool, please note that implementation of new features may depend on available funding.
 
 ## To be investigated further
-- Add option to make a ZIP file of the cached codebooks available for download
-- Add support for Research Manager EDC
-- Add support for Repeating Groups for some of the EDCs
-- Add a new page which allows the user to give the CRF a name, etc.
+- Look into CDISC eCRF Portal as source (perhaps https://www.cdisc.org/cdisc-library/api-documentation#/)
+- Add support for linkml
+- Add support for new ART-DECOR
 - Add scaling to better support higher / lower resolutions
+- Add support for Repeating Groups for some of the EDCs
+- Remove the default defaultiCRFSettings from the resources? To allow it to be updated more easily?
+- Add option to make a ZIP file of the cached codebooks available for download
+- Add a new page which allows the user to give the CRF a name, etc.
+- Add support for Research Manager EDC
 
 ## Finished!
 - Add support for CDISC ODM (NWO-funded)
