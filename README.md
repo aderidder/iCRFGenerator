@@ -10,7 +10,10 @@ ART-DECOR moved stuff, breaking the iCRF Generator. The fix is easy:
   * In the column Server, replace https://decor.nictiz.nl/services/ with https://decor.nictiz.nl/decor/services/
 * Save the file
 * Done!
+
 This will be fixed in the next release.
+
+---
 
 Semantic interoperability of clinical data requires the use of a common vocabulary, such as SNOMED-CT. Unfortunately, mapping data to such a terminology is time-consuming and requires expert knowledge of both the dataset and the terminology. A viable alternative can be the reuse of codebooks - published dataset definitions which, in some cases, have already been mapped to a terminology. We designed the iCRF Generator, a tool which makes it easy to generate interoperable Case Report Forms (iCRFs) for several major EDCs, including Castor and REDCap. The tool currently provides access to multiple codebooks stored online in ART-DECOR and OpenEHR, such as: 
 * The Basic Health Data Set (Basisgegevensset Zorg), which is the national standard hospitals will use to exchange electronic healthcare record data
