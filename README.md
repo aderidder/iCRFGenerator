@@ -2,17 +2,6 @@
 
 **The NWO-Funded Extended iCRF Generator (version 2.0) has just been released! See the News section for all the changes!**<br>
 
-## Breaking news!!
-ART-DECOR moved stuff, breaking the iCRF Generator. The fix is easy:
-* Start the iCRF Generator. Exit again
-* Go to the cache directory - probably iCRFGenerator\cache 
-* Edit iCRFSettings.xlsx
-  * In the column Server, replace https://decor.nictiz.nl/services/ with https://decor.nictiz.nl/decor/services/
-* Save the file
-* Done!
-
-This will be fixed in the next release.
-
 ---
 
 Semantic interoperability of clinical data requires the use of a common vocabulary, such as SNOMED-CT. Unfortunately, mapping data to such a terminology is time-consuming and requires expert knowledge of both the dataset and the terminology. A viable alternative can be the reuse of codebooks - published dataset definitions which, in some cases, have already been mapped to a terminology. We designed the iCRF Generator, a tool which makes it easy to generate interoperable Case Report Forms (iCRFs) for several major EDCs, including Castor and REDCap. The tool currently provides access to multiple codebooks stored online in ART-DECOR and OpenEHR, such as: 
@@ -25,6 +14,11 @@ By using the definitions from such codebooks, a user ensures interoperability wi
 ***Learn more about the iCRF Generator in the [publication](https://f1000research.com/articles/9-81). If you use the iCRF Generator for your project, please cite the paper!***
 
 ## News
+New in 2.0.1 - minor release:
+* Fixed ART-DECOR server references
+* Updated several package, which were outdated
+* Corrected date-time mapping for Castor, which supports this. 
+
 New in 2.0 - This is major release and includes many new features:
 * Support for OpenEHR - Specifically, we've added codebooks from ckm.openehr.org
 * Support for CDISC's ODM-XML

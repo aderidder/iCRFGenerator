@@ -24,11 +24,6 @@ import icrfgenerator.gui.MainWindow;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
-// TODO:
-//  - Page that allows user to specify Study name etc
-//  - Page that allows user to define groups of elements
-//  - Add Research Manager EDC?
-
 class CRFGenerator {
 
     public static void main(String [] args) {

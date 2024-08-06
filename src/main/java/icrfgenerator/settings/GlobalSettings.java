@@ -57,9 +57,9 @@ public class GlobalSettings {
     static {
         setupCacheDir();
         readiCRFSettingsFile();
-        serverToOnlineURL.put("https://ckm.openehr.org/ckm/", "https://ckm.openehr.org/ckm/archetypes/");
-        serverToOnlineURL.put("https://decor.nictiz.nl/services/", "https://decor.nictiz.nl/art-decor/decor-project--");
-
+        serverToOnlineURL.put("https://ckm.openehr.org/ckm/", "https://ckm.openehr.org/ckm/archetypes/CODEBOOK_PREFIX");
+//        serverToOnlineURL.put("https://decor.nictiz.nl/decor/services/", "https://decor.nictiz.nl/art-decor/decor-project--");
+        serverToOnlineURL.put("https://decor.nictiz.nl/decor/services/", "https://decor.nictiz.nl/ad/#/CODEBOOK_PREFIX/project/overview");
     }
 
     /**
@@ -120,7 +120,8 @@ public class GlobalSettings {
      * @return a String which can be used to go to the codebook online
      */
     public static String getOnlineURLString(String codebook){
-        return serverToOnlineURL.get(getServer(codebook))+getCodebookPrefix(codebook);
+        String link = serverToOnlineURL.get(getServer(codebook));
+        return link.replaceAll("CODEBOOK_PREFIX", getCodebookPrefix(codebook));
     }
 
     /**

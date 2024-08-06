@@ -28,7 +28,7 @@ import java.util.List;
 public class CastorDefinition {
     // define the field types that do / do not have a codelist
     private static final List<String> codeListFieldTypes = Arrays.asList("checkbox", "dropdown", "radio");
-    private static final List<String> nonCodeListFieldTypes = Arrays.asList("date", "numeric", "string", "textarea");
+    private static final List<String> nonCodeListFieldTypes = Arrays.asList("datetime", "date", "numeric", "string", "textarea");
 
     /**
      * returns a list with the field types that have a codelist
@@ -60,6 +60,7 @@ public class CastorDefinition {
             case "radio" -> "Radiobutton";
             case "string" -> "Textfield";
             case "textarea" -> "Multiline textfield";
+            case "datetime" -> "Date & Time";
             default -> "Unknown...";
         };
     }

@@ -296,7 +296,7 @@ abstract public class CastorEDC extends EDCDefault {
                 append("<field_is_alias>0</field_is_alias>").
                 append("<field_variable_name>").append(fieldName).append("</field_variable_name>").
                 append("<field_type>").append(fieldType).append("</field_type>").
-                append("<field_type_description>").append(fieldDescription).append("</field_type_description>").
+                append("<field_type_description>").append(StringUtils.prepareValueForXML(fieldDescription)).append("</field_type_description>").
                 append("<field_option_group>").append(optionGroupId).append("</field_option_group>").
                 append("<field_custom_type></field_custom_type>").
                 append("<field_required>").append(fieldRequired).append("</field_required>").

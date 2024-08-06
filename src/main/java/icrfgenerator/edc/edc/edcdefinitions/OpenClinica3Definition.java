@@ -29,17 +29,10 @@ public class OpenClinica3Definition{
     private static final List<String> nonCodeListFieldTypes = Arrays.asList("text", "textarea");
 
     private static final List<String> fieldTypeWithDefaultList = Arrays.asList("single-select", "multi-select");
-//    private static final List<String> supportedDatatypes = Arrays.asList("INT", "REAL", "ST", "DATE");
 
     private static final Map<String, List<String>> fieldTypeDataTypesMap = new HashMap<>();
 
     static {
-//        fieldTypeDataTypesMap.put("textarea", List.of("ST"));
-//        fieldTypeDataTypesMap.put("text", List.of("INT", "REAL", "ST", "DATE"));
-//        fieldTypeDataTypesMap.put("single-select", List.of("INT", "ST"));
-//        fieldTypeDataTypesMap.put("radio", List.of("INT", "ST"));
-//        fieldTypeDataTypesMap.put("multi-select", List.of("INT", "ST"));
-//        fieldTypeDataTypesMap.put("checkbox", List.of("INT", "ST"));
         fieldTypeDataTypesMap.put("textarea", new ArrayList<>(List.of("ST")));
         fieldTypeDataTypesMap.put("text", new ArrayList<>(List.of("INT", "REAL", "ST", "DATE")));
         fieldTypeDataTypesMap.put("single-select", new ArrayList<>(List.of("INT", "ST")));
