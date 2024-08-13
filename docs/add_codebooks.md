@@ -1,5 +1,5 @@
 # Adding new codebooks to the iCRF Generator
-After starting the iCRF Generator for the first time, your cache directory will contains a codebooks.xlsx file. Head to the "Codebooks" tab.
+After starting the iCRF Generator for the first time, your cache directory will contains a iCRFSettings.xlsx file. Head to the "Codebooks" tab.
 
 ## Adding an OpenEHR codebook
 - Go to the [OpenEHR](https://ckm.openehr.org/ckm/) website
