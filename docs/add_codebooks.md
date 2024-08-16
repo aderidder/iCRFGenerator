@@ -1,5 +1,5 @@
 # Adding new codebooks to the iCRF Generator
-After starting the iCRF Generator for the first time, your cache directory will contains a iCRFSettings.xlsx file. Head to the "Codebooks" tab.
+After starting the iCRF Generator for the first time, your cache directory will contain an iCRFSettings.xlsx file. Head to the "Codebooks" tab.
 
 ## Adding an OpenEHR codebook
 - Go to the [OpenEHR](https://ckm.openehr.org/ckm/) website
@@ -17,18 +17,18 @@ After starting the iCRF Generator for the first time, your cache directory will 
 Please be aware that we cannot guarantee that iCRF Generator is compatible with every codebook available in OpenEHR!
 
 ## Adding an ART-DECOR codebook
-- Go to ART-DECOR's [project index](https://decor.nictiz.nl/services/ProjectIndex)
-- Select the project, e.g. CBS doodsoorzakenstatistiek
-- The URL now shows something like https://decor.nictiz.nl/services/ProjectIndex?prefix=cbs-dstat-&format=html&language=&ui=nl-NL
+- Go to ART-DECOR's [project index](https://decor.nictiz.nl/decor/services/ProjectIndex)
+- Select a project, e.g. CBS doodsoorzakenstatistiek
+- The URL now shows something like https://decor.nictiz.nl/decor/services/ProjectIndex?prefix=cbs-dstat-&format=html&language=&ui=nl-NL
 - Take the prefix from this URL, cbs-dstat-
 - Add this to the codebooks tab
 - For this example, the entries would become:
 
-| type     | name                        | prefix     | server                            | group_is_item | tags  | skip_language |
-|----------|-----------------------------|------------|-----------------------------------|---------------|-------|---------------|
-| ARTDECOR | CBS doodsoorzakenstatistiek | cbs-dstat- | https://decor.nictiz.nl/services/ | FALSE         | death |
+| type     | name                        | prefix     | server                                  | group_is_item | tags  | skip_language |
+|----------|-----------------------------|------------|-----------------------------------------|---------------|-------|---------------|
+| ARTDECOR | CBS doodsoorzakenstatistiek | cbs-dstat- | https://decor.nictiz.nl/decor/services/ | FALSE         | death |
 
 Please be aware that we cannot guarantee that iCRF Generator is compatible with every codebook available in ART-DECOR!
 
-## Concerning tags
+## Tags column
 The tags are used to filter codebooks in the Search Codebooks part of the iCRF Generator.
