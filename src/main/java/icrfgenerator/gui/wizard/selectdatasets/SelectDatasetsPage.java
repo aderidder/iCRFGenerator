@@ -183,7 +183,7 @@ public class SelectDatasetsPage extends WizardPane {
             // retrieve the version, name and date
             String datasetVersion = codebookManager.getDatasetVersion(codebook, datasetIdentifier);
             String datasetName = codebookManager.getDatasetName(codebook, datasetIdentifier);
-            String datasetDate = codebookManager.getDatasetEffectiveDate(codebook, datasetIdentifier);
+            String datasetDate = codebookManager.getDatasetEffectiveDateFormattedString(codebook, datasetIdentifier);
             String dateString = datasetDate.equalsIgnoreCase("01-Jan-1900")?"":" ("+datasetDate+")";
 
             // create a checkbox

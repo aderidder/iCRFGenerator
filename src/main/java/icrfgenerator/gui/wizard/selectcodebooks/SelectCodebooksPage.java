@@ -21,6 +21,7 @@ package icrfgenerator.gui.wizard.selectcodebooks;
 
 import icrfgenerator.gui.i18n.I18N;
 import icrfgenerator.resourcemanagement.ResourceManager;
+import icrfgenerator.settings.CodebookInfo;
 import icrfgenerator.settings.GlobalSettings;
 import icrfgenerator.settings.runsettings.RunSettings;
 import icrfgenerator.utils.GUIUtils;
@@ -171,13 +172,15 @@ public class SelectCodebooksPage extends WizardPane {
     }
 
     /**
-     * create a clickable "i" which leads to the codebook online
+     * create a clickable "source" which leads to the codebook online
      * @param codebook name of the codebook
      * @return the link
      */
     private Hyperlink createHyperlink(String codebook){
-        Hyperlink hyperlink = new Hyperlink("i");
+        String source = GlobalSettings.getSource(codebook);
+        Hyperlink hyperlink = new Hyperlink("("+source+")");
         hyperlink.setStyle("-fx-padding: -4 0 -4 0");
+        if (source.equalsIgnoreCase("openEHR")) hyperlink.setStyle("-fx-text-fill: red;");
         hyperlink.setOnAction(event -> {
             try {
                 Desktop.getDesktop().browse(new URI(GlobalSettings.getOnlineURLString(codebook)));

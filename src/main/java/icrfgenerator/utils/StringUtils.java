@@ -24,6 +24,30 @@ package icrfgenerator.utils;
  * helper functions for strings
  */
 public class StringUtils {
+    /**
+     * Converts a string into a valid identifier:
+     * - Only alphanumerics and $, #, _, @ are allowed.
+     * - Disallowed characters are replaced with underscores.
+     * - Multiple consecutive underscores are collapsed into one.
+     * - The first character is replaced with an underscore if it's not a letter.
+     *
+     * @param input the input string
+     * @return a cleaned identifier string
+     */
+    public static String cleanIdentifier(String input) {
+        // Replace disallowed characters with underscores
+        String cleaned = input.replaceAll("[^a-zA-Z0-9$#_@]", "_");
+
+        // Collapse multiple underscores into one
+        cleaned = cleaned.replaceAll("_+", "_");
+
+        // Ensure the first character is a letter; if not, replace it with underscore
+        if (!Character.isLetter(cleaned.charAt(0))) {
+            cleaned = "_" + cleaned.substring(1);
+        }
+
+        return cleaned;
+    }
 
     /**
      * removes all spaces from a string

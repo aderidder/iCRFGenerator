@@ -215,8 +215,19 @@ public class CodebookManager {
      * @param datasetIdentifier identifier of the dataset
      * @return the effective date
      */
-    public String getDatasetEffectiveDate(String codebookName, String datasetIdentifier){
-        return codebookMetaDataMap.get(codebookName).getDatasetEffectiveDate(datasetIdentifier);
+    public String getDatasetEffectiveDateFormattedString(String codebookName, String datasetIdentifier){
+        return codebookMetaDataMap.get(codebookName).getDatasetEffectiveDateFormattedString(datasetIdentifier);
+    }
+
+    /**
+     * returns the original String representation of the effective date of a dataset
+     * Problem is that in some cases we are provided with an effectiveDate like:
+     * @param codebookName name of the codebook
+     * @param datasetIdentifier identifier of the dataset
+     * @return the effective date
+     */
+    public String getDatasetEffectiveDateOriginalString(String codebookName, String datasetIdentifier){
+        return codebookMetaDataMap.get(codebookName).getDatasetEffectiveDateOriginalString(datasetIdentifier);
     }
 
     /**

@@ -280,7 +280,7 @@ abstract public class CastorEDC extends EDCDefault {
         String fieldType = runSettings.getSelectedItemFieldType(key, itemId);
         String fieldDescription = CastorDefinition.getFieldTypeDescription(fieldType);
         String fieldLabel = codebookItem.getItemName();
-        String fieldName = makeUnique(StringUtils.removeSpacesFromString(fieldLabel));
+        String fieldName = makeUnique(StringUtils.cleanIdentifier(fieldLabel));
         String fieldRequired = runSettings.getSelectedItemRequiredValue(key, itemId) ? "1" : "0";
         String fieldRequiredDescr = fieldRequired.equalsIgnoreCase("1") ? "Required" : "Not required";
         String fieldUnits = runSettings.getSelectedItemUnitsValue(key, itemId);

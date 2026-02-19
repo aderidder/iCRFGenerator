@@ -22,7 +22,6 @@
 /* set hyperlink styles */
 .hyperlink {
     -fx-font-style: italic;
-    -fx-font-weight: bold;
     -fx-text-fill: green;
     -fx-border-style: none;
     -fx-underline: true;

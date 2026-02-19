@@ -1,6 +1,6 @@
 # The iCRF Generator
 
-**The NWO-Funded Extended iCRF Generator (version 2.0) has just been released! See the News section for all the changes!**<br>
+**Update. The iCRF Generator’s openEHR support is currently non-functional. The library we rely on is not compatible with the ADL 2.4 format returned by openEHR. We are awaiting ADL 2.4 support in this underlying dependency before functionality can be restored.**<br>
 
 ---
 
@@ -14,6 +14,14 @@ By using the definitions from such codebooks, a user ensures interoperability wi
 ***Learn more about the iCRF Generator in the [publication](https://f1000research.com/articles/9-81). If you use the iCRF Generator for your project, please cite the paper!***
 
 ## News
+New in 2.1 - minor release:
+* Fixed ART-DECOR's web-call, which now requires an extra parameter
+* Updated outdated packages
+
+New in 2.0.2 - minor release:
+* Updated several package, which were outdated
+* Corrected date-time mapping for Castor, which supports this.
+
 New in 2.0.1 - minor release:
 * Fixed ART-DECOR server references
 * Updated several package, which were outdated

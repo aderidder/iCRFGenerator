@@ -49,13 +49,23 @@ abstract public class CodebookMetaDataDefault implements CodebookMetaData {
     }
 
     /**
-     * returns the effective date of the dataset
+     * returns the effective date of the dataset, formatted
      * @param datasetIdentifier the id of the dataset
      * @return the effective date of the dataset
      */
     @Override
-    public String getDatasetEffectiveDate(String datasetIdentifier){
-        return idToDatasetMetaDataMap.get(datasetIdentifier).getEffectiveDate();
+    public String getDatasetEffectiveDateFormattedString(String datasetIdentifier){
+        return idToDatasetMetaDataMap.get(datasetIdentifier).getEffectiveDateFormattedString();
+    }
+
+    /**
+     * returns the effective date of the dataset, original format
+     * @param datasetIdentifier the id of the dataset
+     * @return the effective date of the dataset
+     */
+    @Override
+    public String getDatasetEffectiveDateOriginalString(String datasetIdentifier){
+        return idToDatasetMetaDataMap.get(datasetIdentifier).getEffectiveDateOriginalString();
     }
 
     /**
@@ -82,6 +92,7 @@ abstract public class CodebookMetaDataDefault implements CodebookMetaData {
         private final String version;
         private final String id;
         private final String name;
+        private final String effectiveDateOriginalString;
         private final List<String> extendedLanguages;
         private final Map<String, List<String>> simpleToExtendedLanguageMap = new HashMap<>();
 
@@ -91,6 +102,7 @@ abstract public class CodebookMetaDataDefault implements CodebookMetaData {
             this.id = id;
             this.version = version;
             this.name = name;
+            this.effectiveDateOriginalString = effectiveDate;
 
             this.extendedLanguages = extendedLanguages;
             handleLanguages();
@@ -162,8 +174,16 @@ abstract public class CodebookMetaDataDefault implements CodebookMetaData {
          * returns the dataset effective date
          * @return the dataset effective date
          */
-        String getEffectiveDate() {
+        String getEffectiveDateFormattedString() {
             return dateFormatter2.format(effectiveDate);
+        }
+
+        /**
+         * returns the original effective date string
+         * @return the original effective date string
+         */
+        String getEffectiveDateOriginalString(){
+            return effectiveDateOriginalString;
         }
 
         @Override

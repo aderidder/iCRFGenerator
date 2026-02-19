@@ -42,6 +42,11 @@
             <AppenderRef ref="STDOUT"/>
             <AppenderRef ref="FileAppender"/>
         </Logger>
+        <Logger name="org.apache.poi" level="error" additivity="false">
+            <AppenderRef ref="LogAreaLogger"/>
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="FileAppender"/>
+        </Logger>
         <Root level="debug">
             <AppenderRef ref="LogAreaLogger" level="info"/>
             <AppenderRef ref="STDOUT" level="info"/>

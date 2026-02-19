@@ -36,7 +36,7 @@ public class CodebookOpenEHRMetaData extends CodebookMetaDataDefault {
         List<String> languages = OpenEHRCodebookRepository.getLanguages(codebookName);
         String version = OpenEHRCodebookRepository.getVersion(codebookName);
         // there does not seem to be a date
-        String date = "";
+        String date = "01-Jan-1900";
         DatasetMetaData datasetMetaData = new DatasetMetaData(id, version, name, date, languages);
         idToDatasetMetaDataMap.put(id, datasetMetaData);
     }

@@ -24,7 +24,16 @@ public interface CodebookMetaData {
      * @param datasetIdentifier dataset identifier
      * @return effective date string
      */
-    String getDatasetEffectiveDate(String datasetIdentifier);
+    String getDatasetEffectiveDateFormattedString(String datasetIdentifier);
+
+    /**
+     * ART-DECOR can have an effectiveDate which looks like "2021-07-20T24:00:00"
+     * turning that into a proper date using a dateFormatter changes it to "2021-07-21T00:00:00"
+     * Unfortunately that breaks the codebook retrieval process, which nowadays needs this effectiveDate.
+     * @param datasetIdentifier dataset identifier
+     * @return original string representation of the effective date
+     */
+    String getDatasetEffectiveDateOriginalString(String datasetIdentifier);
 
     /**
      * returns the dataset's name

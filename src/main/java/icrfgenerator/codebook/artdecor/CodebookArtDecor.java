@@ -20,6 +20,7 @@
 package icrfgenerator.codebook.artdecor;
 
 import icrfgenerator.codebook.CodebookDefault;
+import icrfgenerator.codebook.CodebookManager;
 import icrfgenerator.codebook.shared.CodebookStructureNode;
 import icrfgenerator.types.NodeType;
 import icrfgenerator.types.OperatorType;
@@ -77,8 +78,9 @@ public class CodebookArtDecor extends CodebookDefault {
      */
     public CodebookArtDecor(String datasetId, String extendedLanguage, String codebookName){
         super(datasetId, extendedLanguage, codebookName);
+        String effectiveDate = CodebookManager.getInstance().getDatasetEffectiveDateOriginalString(codebookName,datasetId);
         // Get the XML file and create a codebook for it
-        File xmlFile = getArtDecorCodebookFile(codebookName, datasetId, extendedLanguage);
+        File xmlFile = getArtDecorCodebookFile(codebookName, datasetId, extendedLanguage, effectiveDate);
         Element rootElement = getRootElement(xmlFile);
         createBook(rootElement, root);
     }
@@ -99,9 +101,10 @@ public class CodebookArtDecor extends CodebookDefault {
      * @param codebookName     name of the codebook
      * @param datasetId        id of the dataset, e.g. 2.16.840.1.113883.2.4.3.11.60.42.1.1
      * @param extendedLanguage language of interest of the dataset, e.g. nl-NL
+     * @param effectiveDate    the original string representation of the effectiveDate
      */
-    private static File getArtDecorCodebookFile(String codebookName, String datasetId, String extendedLanguage){
-        String uri = GlobalSettings.getServer(codebookName)+"RetrieveDataSet?id="+datasetId+"&language="+extendedLanguage+"&format=xml";
+    private static File getArtDecorCodebookFile(String codebookName, String datasetId, String extendedLanguage, String effectiveDate){
+        String uri = GlobalSettings.getServer(codebookName)+"RetrieveDataSet?id="+datasetId+"&language="+extendedLanguage+"&format=xml&effectiveDate="+effectiveDate;
         String dir = GlobalSettings.getCacheDir()+File.separator;
         String fileName = dir+datasetId+extendedLanguage+".xml";
         return RestCalls.getFile(uri, fileName);
@@ -231,9 +234,10 @@ public class CodebookArtDecor extends CodebookDefault {
     private Element getRefOtherCodebookElement(Element element){
         String ref = element.getAttribute("ref");
         String datasetId = element.getAttribute("datasetId");
+        String flexibility = element.getAttribute("flexibility");
 
         // get the xml file for the referred dataset and the rootelement
-        File xmlFile = getArtDecorCodebookFile(codebookName, datasetId, extendedLanguage);
+        File xmlFile = getArtDecorCodebookFile(codebookName, datasetId, extendedLanguage, flexibility);
         Element rootElement = getRootElement(xmlFile);
 
         // use xpath to quickly find our element of interest and return it
